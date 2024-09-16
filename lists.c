@@ -1,4 +1,5 @@
 #include "header.h"
+#include "globals.h"
 
 /****************************************************************************
  ****************************************************************************/
@@ -16,18 +17,18 @@ char *ys,*ns;
     for (j=0;(j<INVLENGTH)&&(n!=users[i].invitenum[j]);j++);
     if (j==INVLENGTH) {
 	if ((p==-1)||(p==2)) {
-	    (void) sprintf(stringo,"%s is not on your list.\n",cnames[n]);
+	    (void) snprintf(stringo, sizeof(stringo),"%s is not on your list.\n",cnames[n]);
 	    rshow(i,stringo);
 	    return 0;
 	} else {
 	    for (j=0;(j<INVLENGTH)&&(users[i].invitenum[j]!=-1);j++);
 	    if (j==INVLENGTH) {
-		(void) sprintf(stringo,"Theres not enough room on your list to add %s.\n",cnames[n]);
+		(void) snprintf(stringo, sizeof(stringo),"Theres not enough room on your list to add %s.\n",cnames[n]);
 		rshow(i,stringo);
 		return 0;}
 	    users[i].invitenum[j]=n;
 	    users[i].inviteflags[j]=f;
-	    (void) sprintf(stringo,"%s has been added to your list.\n",cnames[n]);
+	    (void) snprintf(stringo, sizeof(stringo),"%s has been added to your list.\n",cnames[n]);
 	    rshow(i,stringo);
 	    if (f==16) (void) giveinvite(i,n);
 	    return 0;
@@ -35,9 +36,9 @@ char *ys,*ns;
     }
     if (p==2) {
 	if ((users[i].inviteflags[j]&f)==0) {
-	    (void) sprintf(stringo,ns,cnames[n]);
+	    (void) snprintf(stringo, sizeof(stringo),ns,cnames[n]);
 	} else {
-	    (void) sprintf(stringo,ys,cnames[n]);
+	    (void) snprintf(stringo, sizeof(stringo),ys,cnames[n]);
 	}
 	rshow(i,stringo);
 	return 0;
@@ -48,7 +49,7 @@ char *ys,*ns;
     }
     if (p==1) {
 	users[i].inviteflags[j]|=f;
-	(void) sprintf(stringo,ys,cnames[n]);
+	(void) snprintf(stringo, sizeof(stringo),ys,cnames[n]);
 	rshow(i,stringo);
 	if (f==16) (void) giveinvite(i,n);
 	return 0;}
@@ -56,10 +57,10 @@ char *ys,*ns;
     users[i].inviteflags[j]^=f;
     if (users[i].inviteflags[j]==0) {
 	users[i].invitenum[j]=-1;
-	(void) sprintf(stringo,"%s has been removed from your list.\n",cnames[n]);
+	(void) snprintf(stringo, sizeof(stringo),"%s has been removed from your list.\n",cnames[n]);
 	rshow(i,stringo);
 	return 0;}
-    (void) sprintf(stringo,ns,cnames[n]);
+    (void) snprintf(stringo, sizeof(stringo),ns,cnames[n]);
     rshow(i,stringo);
     return 0;
 }
@@ -135,7 +136,7 @@ int i,n;
 {
     int j;
     if ((j=finduser(unames[n]))<0) return 0;
-    (void) sprintf(stringq,"You are invited to %s's mindscape.\n",users[i].name);
+    (void) snprintf(stringq, sizeof(stringq),"You are invited to %s's mindscape.\n",users[i].name);
     rshow(j,stringq);
     return 0;
 }
@@ -159,16 +160,16 @@ int i;
 		int f;
 		done++;
 		f=users[i].inviteflags[j];
-		(void) sprintf(stringo,"       %-16s  %s   %s   %s   %s   %s   %s   %s\n",cnames[users[i].invitenum[j]],(f&1)==0?"----":"YES!",(f&2)==0?"----":"YES!",(f&4)==0?"----":"YES!",(f&8)==0?"----":"YES!",(f&16)==0?"----":"YES!",(f&32)==0?"----":"YES!",(f&64)==0?"----":"YES!");
+		(void) snprintf(stringo, sizeof(stringo),"       %-16s  %s   %s   %s   %s   %s   %s   %s\n",cnames[users[i].invitenum[j]],(f&1)==0?"----":"YES!",(f&2)==0?"----":"YES!",(f&4)==0?"----":"YES!",(f&8)==0?"----":"YES!",(f&16)==0?"----":"YES!",(f&32)==0?"----":"YES!",(f&64)==0?"----":"YES!");
 		rshow(i,stringo);
 	    }
 	}
     }
     if (done==0) return -2;
-    (void) sprintf(stringo,"Users %d-%d from a total of %d.\n",start+1,start+done,count);
+    (void) snprintf(stringo, sizeof(stringo),"Users %d-%d from a total of %d.\n",start+1,start+done,count);
     rshow(i,stringo);
     if (count>(start+done)) {
-	(void) sprintf(stringo,"There will be more users on 'list %d'\n",start/(users[i].ttyheight-3)+2);
+	(void) snprintf(stringo, sizeof(stringo),"There will be more users on 'list %d'\n",start/(users[i].ttyheight-3)+2);
 	rshow(i,stringo);}
     return 0; 
 };
@@ -209,9 +210,9 @@ int i;
 		    if ((users[j].flags&0x80000)!=0) k=99999;
 		if (k>=0) {
 		    if (k!=99999) {
-			(void) sprintf(stringo,"In-%-15s: %.59s\n",users[j].name,users[j].scapename);
+			(void) snprintf(stringo, sizeof(stringo),"In-%-15s: %.59s\n",users[j].name,users[j].scapename);
 		    } else {
-			(void) sprintf(stringo,"Op-%-15s: %.59s\n",users[j].name,users[j].scapename);
+			(void) snprintf(stringo, sizeof(stringo),"Op-%-15s: %.59s\n",users[j].name,users[j].scapename);
 		    }
 		    rshow(i,stringo);
 		} 
@@ -234,7 +235,7 @@ int i;
 	    if ((users[j].inviteflags[k]&4)!=0) {
 		if (l==0) rshow(i,"You can currently grab the following people.\n");
 		l++;
-		(void) sprintf(stringo,"%s %s\n",users[j].name,users[j].title);
+		(void) snprintf(stringo, sizeof(stringo),"%s %s\n",users[j].name,users[j].title);
 		rshow(i,stringo);
 	    }
 	}
@@ -265,12 +266,12 @@ int i;
 	rshow(i,"But they're HERE!\n");
 	return 0;
     }
-    (void) sprintf(stringo,"You're grabbed by %s.\n",users[i].name);
+    (void) snprintf(stringo, sizeof(stringo),"You're grabbed by %s.\n",users[i].name);
     rshow(j,stringo);
-    (void) sprintf(stringo,"You grab %s.\n",users[j].name);
+    (void) snprintf(stringo, sizeof(stringo),"You grab %s.\n",users[j].name);
     rshow(i,stringo);
-    (void) sprintf(stringp,"%s is yanked away by an unseen force.\n",users[j].name);
-    (void) sprintf(stringq,"%s spins rapidly into being.\n",users[j].name);
+    (void) snprintf(stringp, sizeof(stringp),"%s is yanked away by an unseen force.\n",users[j].name);
+    (void) snprintf(stringq, sizeof(stringq),"%s spins rapidly into being.\n",users[j].name);
     moveuser(j,users[i].room,stringp,stringq);
     return 0;
 }
@@ -298,7 +299,7 @@ int i;
 		    case 2 : (void) strcpy(ltype,"Wwk.");break;
 			default : (void) strcpy(ltype,"----");
 		    }
-		    (void) sprintf(stringo,"%s - %s %s\n",ltype,users[k].name,users[k].title);
+		    (void) snprintf(stringo, sizeof(stringo),"%s - %s %s\n",ltype,users[k].name,users[k].title);
 		    if ((users[k].flags&1)!=0) stringo[5]='+';
 		    if ((stringo[78]!=0)&&(stringo[78]!='\n')) {
 			stringo[78]='\n';
@@ -311,10 +312,10 @@ int i;
 	rshow(i,"You have no friends on at the moment. *schniff* 8-(\n");
 	return 0;}
     if (done==0) return -2;
-    (void) sprintf(stringo,"Friends %d-%d from a total of %d.\n",start+1,start+done,count);
+    (void) snprintf(stringo, sizeof(stringo),"Friends %d-%d from a total of %d.\n",start+1,start+done,count);
     rshow(i,stringo);
     if (count>(start+done)) {
-	(void) sprintf(stringo,"There will be more users on 'qw %d'\n",start/(users[i].ttyheight-3)+2);
+	(void) snprintf(stringo, sizeof(stringo),"There will be more users on 'qw %d'\n",start/(users[i].ttyheight-3)+2);
 	rshow(i,stringo);}
     return 0; 
 };
@@ -342,7 +343,7 @@ int i;
 			if ((count>start)&&(done<users[i].ttyheight)) {
 			    done++;
 			    (void) roomname(users[k].room,stringp);
-			    (void) sprintf(stringo,"%s is in %s\n",users[k].name,stringp);
+			    (void) snprintf(stringo, sizeof(stringo),"%s is in %s\n",users[k].name,stringp);
 			    rshow(i,stringo);
 			}
 		    }
@@ -353,10 +354,10 @@ int i;
 	rshow(i,"You have no friends on at the moment. *schniff* 8-(\n");
 	return 0;}
     if (done==0) return -2;
-    (void) sprintf(stringo,"Friends %d-%d from a total of %d.\n",start+1,start+done,count);
+    (void) snprintf(stringo, sizeof(stringo),"Friends %d-%d from a total of %d.\n",start+1,start+done,count);
     rshow(i,stringo);
     if (count>(start+done)) {
-	(void) sprintf(stringo,"There will be more users on 'qf %d'\n",start/(users[i].ttyheight-3)+2);
+	(void) snprintf(stringo, sizeof(stringo),"There will be more users on 'qf %d'\n",start/(users[i].ttyheight-3)+2);
 	rshow(i,stringo);}
     return 0; 
 };

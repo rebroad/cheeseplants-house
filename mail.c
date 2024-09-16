@@ -1,6 +1,9 @@
 #include "header.h"
+#include "functions.h"
+#include "globals.h"
 #include <sys/mman.h>
 #include <unistd.h>
+#include <stdio.h>
 
 int iptr,bptr[16];
 
@@ -65,54 +68,98 @@ static void MailSet_Quota(int n, int v) {
 
 #endif
 
+#define DEBUG_PRINT(fmt, ...) \
+    fprintf(stderr, "DEBUG [%s:%d]: " fmt "\n", __func__, __LINE__, ##__VA_ARGS__)
+
 /****************************************************************************
   FUNCTION - mailinit()
   Opens/creates the 16 Mailbox files as bptr[0-15] and mmaps/creates the
   MailInfo file as the int array bods. If any of this fails, exit() is called.
  ****************************************************************************/
 
-mailinit()
-{
+int mailinit() {
     int i;
     char boxname[16];
+
+    DEBUG_PRINT("Entering mailinit");
+
+    if (mkdir("Mail", 0755) == -1 && errno != EEXIST) {
+        perror("Failed to create Mail directory");
+        exit(1);
+    }
+
     if ((iptr=open("Mail/MailInfo",O_RDONLY))==-1) {
-	if ((iptr=open("Mail/MailInfo",O_CREAT|O_WRONLY,-1))==-1) {
+        DEBUG_PRINT("MailInfo doesn't exist, creating it");
+	if ((iptr=open("Mail/MailInfo",O_CREAT|O_WRONLY,0644))==-1) {
+            DEBUG_PRINT("Failed to create MailInfo");
 	    exit(1);}
-	for (i=0;i<MAXUSERS*3;i++) putint(iptr,0);
+	for (i=0;i<MAXUSERS*3;i++) {
+            DEBUG_PRINT("Writing initial data to MailInfi, i=%d", i);
+            putint(iptr,0);
+        }
 #ifndef HAS_MMAP
 	close(iptr);
 #endif
+        DEBUG_PRINT("Creating mailboxes");
         strcpy(boxname,"Mail/MailBoxA");
         for (i=0;i<16;i++) {
+            DEBUG_PRINT("Creating mailbox %s", boxname);
             if ((bptr[i]=open(boxname,O_CREAT|O_WRONLY,-1))==-1) {
+                DEBUG_PRINT("Failed to create mailbox %s", boxname);
                 exit(1);}
             boxname[12]++;
+            DEBUG_PRINT("About to close bptr[%d]", i);
             close (bptr[i]);
+            DEBUG_PRINT("About to set bptr[$d]=-1", i);
 	    bptr[i]=-1;
         }
     } else {
+        DEBUG_PRINT("MailInfo exists");
 #ifndef HAS_MMAP
 	close(iptr);
 #endif
     }
+
+    DEBUG_PRINT("Opening mailboxes");
     strcpy(boxname,"Mail/MailBoxA");
     for (i=0;i<16;i++) {
+        DEBUG_PRINT("Opening mailbox %s", boxname);
 	if ((bptr[i]=open(boxname,O_RDWR,-1))==-1) {
+            DEBUG_PRINT("Failed to open mailbox %s", boxname);
 	    exit(1);}
 	boxname[12]++;
     }
-    if ((iptr=open("Mail/MailInfo",O_RDWR))==-1) exit(1);
+
+    DEBUG_PRINT("Opening MailInfo for reading and writing");
+    if ((iptr=open("Mail/MailInfo",O_RDWR))==-1) {
+        DEBUG_PRINT("Failed to open MailInfo for reading and writing");
+        exit(1);
+    }
+
 #ifdef HAS_MMAP
+    DEBUG_PRINT("Using mmap");
     bods=(int *)mmap((caddr_t)0,(MAXUSERS*3)*4,PROT_READ|PROT_WRITE,MAP_SHARED,iptr,0L);
     close (iptr);
     if ((int)bods==-1) {
+        DEBUG_PRINT("mmap failed");
         exit(1);
     }
 #else
+    DEBUG_PRINT("Not using mmap, allocating memory");
     membods=(int *)calloc((MAXUSERS *3) * 4,1);
-    if (!membods) exit(1);
-    read(iptr, membods, MAXUSERS * 3 * 4);
+    if (!membods) {
+        DEBUG_PRINT("calloc failed");
+        exit(1);
+    }
+    DEBUG_PRINT("Reading from MailInfo into membods");
+    if (read(iptr, membods, MAXUSERS * 3 * 4) != MAXUSERS * 3 * 4) {
+        DEBUG_PRINT("Failed to read expected amount of data from MailInfo");
+        exit(1);
+    }
 #endif
+
+    DEBUG_PRINT("mailinit completed successfully");
+    return 0;
 }
 	
 /****************************************************************************
@@ -125,7 +172,7 @@ int i,n,mm;
 {
     int m,jm,fr,to,ti;
     if (n<0) return 0;
-    sprintf(stringo,"      Messages Sent: %d/%d       Messages Received: %d\n\n",MailCount_Sent(n),LETTERS+MailCount_Quota(n),MailCount_Recvd(n));
+    snprintf(stringo, sizeof(stringo),"      Messages Sent: %d/%d       Messages Received: %d\n\n",MailCount_Sent(n),LETTERS+MailCount_Quota(n),MailCount_Recvd(n));
     rshow(i,stringo);
     if (MailCount_Recvd(n)==0)
 	return 0;
@@ -147,23 +194,23 @@ int i,n,mm;
 		timestr(ti,stringp);
 		switch(jm&0x00030000) {
 		case 0x00000000:
-		    sprintf(stringo,"      %-3d %s  %-15s\n",m++,stringp,cnames[fr]);
+		    snprintf(stringo, sizeof(stringo),"      %-3d %s  %-15s\n",m++,stringp,cnames[fr]);
 		    break;
 		case 0x00010000:
-		    sprintf(stringo,"      %-3d %s  %-15s     -+* NEW *+-\n",m++,stringp,cnames[fr]);
+		    snprintf(stringo, sizeof(stringo),"      %-3d %s  %-15s     -+* NEW *+-\n",m++,stringp,cnames[fr]);
 		    break;
 		case 0x00020000:
 		    if (mm) {
-			sprintf(stringo,"      %-3d %s  ---Anonymous---\n",m++,stringp);
+			snprintf(stringo, sizeof(stringo),"      %-3d %s  ---Anonymous---\n",m++,stringp);
 		    } else {
-			sprintf(stringo,"      %-3d %s (%-15s)\n",m++,stringp,cnames[fr]);
+			snprintf(stringo, sizeof(stringo),"      %-3d %s (%-15s)\n",m++,stringp,cnames[fr]);
 		    }
 		    break;
 		case 0x00030000:
 		    if (mm) {
-			sprintf(stringo,"      %-3d %s  ---Anonymous---     -+* NEW *+-\n",m++,stringp);
+			snprintf(stringo, sizeof(stringo),"      %-3d %s  ---Anonymous---     -+* NEW *+-\n",m++,stringp);
 		    } else {
-			sprintf(stringo,"      %-3d %s (%-15s)    -+* NEW *+-\n",m++,stringp,cnames[fr]);
+			snprintf(stringo, sizeof(stringo),"      %-3d %s (%-15s)    -+* NEW *+-\n",m++,stringp,cnames[fr]);
 		    }
 		    break;
 		}
@@ -192,7 +239,7 @@ int i;
 	    rshow(i,"They are not a resident.... \n");
 	    return 0;
 	}
-    sprintf(stringo,"You examine %s's mailbox....\n",cnames[n]);
+    snprintf(stringo, sizeof(stringo),"You examine %s's mailbox....\n",cnames[n]);
     rshow(i,stringo);
     return mailinfo(i,n,0);
 }
@@ -259,9 +306,9 @@ int i;
 		    timestr(ti,stringp);
 		    rshow(i,"  ===========================================================================\n");
 		    if (jm&0x00020000) {
-			sprintf(stringo,"Mail from someone anonymous sent %s:\n",stringp);
+			snprintf(stringo, sizeof(stringo),"Mail from someone anonymous sent %s:\n",stringp);
 		    } else {
-			sprintf(stringo,"Mail from %s sent %s:\n",cnames[fr],stringp);
+			snprintf(stringo, sizeof(stringo),"Mail from %s sent %s:\n",cnames[fr],stringp);
 		    }
 		    rshow(i,stringo);
 		    read(bptr[n&15],stringo,(jm&0xffff)-12);
@@ -270,7 +317,7 @@ int i;
 		    maildecrypt(stringo);
 		    for (j=0;stringo[j]!=0;j++)
 			if (stringo[j]=='\177') stringo[j]='\n';
-		    sprintf(stringp,"%s\n  ===========================================================================\n",stringo);
+		    snprintf(stringp, sizeof(stringp),"%s\n  ===========================================================================\n",stringo);
 		    rshow(i,stringp);
 		    return 0;
 		}
@@ -368,9 +415,9 @@ char *n;
     /* send mail to user k */
     if ((m=findusernum(j))<0) return 0;
     if (ff&0x00020000) {
-	sprintf(stringo,"     **** You have new mail from someone anonymous (read %d) ****.\n",MailCount_Recvd(j));
+	snprintf(stringo, sizeof(stringo),"     **** You have new mail from someone anonymous (read %d) ****.\n",MailCount_Recvd(j));
     } else {
-	sprintf(stringo,"     **** You have new mail from %s (read %d) ****.\n",users[i].name,MailCount_Recvd(j));
+	snprintf(stringo, sizeof(stringo),"     **** You have new mail from %s (read %d) ****.\n",users[i].name,MailCount_Recvd(j));
     }
     rshow(m,stringo);
     return 0;
@@ -510,7 +557,7 @@ int j;
     int saved;
     char msg[2048];
     char boxname[16];
-    pstatus("Cheeseplants House: Mail: Cleaning");
+    //pstatus("Cheeseplants House: Mail: Cleaning");
     rshow(j,"Clearing counters....\n");
     for (i=0;i<MAXUSERS;i++) {
 	MailSet_Sent(i,0);
@@ -558,13 +605,13 @@ int j;
         close(bptr[i]);
         if (unlink("Mail/Tempory")==-1)
             exit(1);
-	sprintf(stringo,"Cleaned out %s...(%d) %d->%d\n",boxname,tempsaved,bptr[i],tptr);
+	snprintf(stringo, sizeof(stringo),"Cleaned out %s...(%d) %d->%d\n",boxname,tempsaved,bptr[i],tptr);
 	rshow(j,stringo);
         boxname[12]++;
     }
-    sprintf(stringo,"%d items of mail processed...\n",items);
+    snprintf(stringo, sizeof(stringo),"%d items of mail processed...\n",items);
     rshow(j,stringo);
-    sprintf(stringo,"%d bytes saved...\n",saved);
+    snprintf(stringo, sizeof(stringo),"%d bytes saved...\n",saved);
     rshow(j,stringo);
     strcpy(boxname,"Mail/MailBoxA");
     for (i=0;i<16;i++) {
@@ -591,7 +638,7 @@ int i;
 	    return 0;
 	}
     if (parv[2][0]!=0) MailSet_Quota(n, MailCount_Quota(n)+atoi(parv[2]));
-    sprintf(stringo,"%s can send %d+%d=%d letters.\n",cnames[n],LETTERS,MailCount_Quota(n),MailCount_Quota(n)+LETTERS);
+    snprintf(stringo, sizeof(stringo),"%s can send %d+%d=%d letters.\n",cnames[n],LETTERS,MailCount_Quota(n),MailCount_Quota(n)+LETTERS);
     rshow(i,stringo);
     return 0;
 }
@@ -605,7 +652,7 @@ mailscan(i,n)
 int i,n;
 {
     int m,jm,fr,to,ti,mb;
-    sprintf(stringo,"      Messages Sent: %d/%d\n\n",MailCount_Sent(n),LETTERS+MailCount_Quota(n));
+    snprintf(stringo, sizeof(stringo),"      Messages Sent: %d/%d\n\n",MailCount_Sent(n),LETTERS+MailCount_Quota(n));
     rshow(i,stringo);
     if (MailCount_Sent(n)==0)
 	return 0;
@@ -628,16 +675,16 @@ int i,n;
 		    timestr(ti,stringp);
 		    switch(jm&0x00030000) {
 		    case 0x00000000:
-			sprintf(stringo,"      %-3d %s  %-15s\n",m++,stringp,cnames[to]);
+			snprintf(stringo, sizeof(stringo),"      %-3d %s  %-15s\n",m++,stringp,cnames[to]);
 			break;
 		    case 0x00010000:
-			sprintf(stringo,"      %-3d %s  %-15s     -+* NEW *+-\n",m++,stringp,cnames[to]);
+			snprintf(stringo, sizeof(stringo),"      %-3d %s  %-15s     -+* NEW *+-\n",m++,stringp,cnames[to]);
 			break;
 		    case 0x00020000:
-			sprintf(stringo,"      %-3d %s  %-15s        Anon.\n",m++,stringp,cnames[to]);
+			snprintf(stringo, sizeof(stringo),"      %-3d %s  %-15s        Anon.\n",m++,stringp,cnames[to]);
 			break;
 		    case 0x00030000:
-			sprintf(stringo,"      %-3d %s  %-15s     New & Anon.\n",m++,stringp,cnames[to]);
+			snprintf(stringo, sizeof(stringo),"      %-3d %s  %-15s     New & Anon.\n",m++,stringp,cnames[to]);
 			break;
 		    }
 		    rshow(i,stringo);
@@ -662,7 +709,7 @@ int i;
 	    rshow(i,"They are not a resident.... \n");
 	    return 0;
 	}
-    sprintf(stringo,"You look for %s's messages....\n",cnames[n]);
+    snprintf(stringo, sizeof(stringo),"You look for %s's messages....\n",cnames[n]);
     rshow(i,stringo);
     return mailscan(i,n);
 }
@@ -707,10 +754,10 @@ int i;
 		    (void) lseek(bptr[n&15],(long) (jm&0xffff)-12,SEEK_CUR);
 		} else {
 		    if (jm&0x00020000) {
-			sprintf(stringo,"Attemtping to reply to the anonymous sender:\n");
+			snprintf(stringo, sizeof(stringo),"Attemtping to reply to the anonymous sender:\n");
 			
 		    } else {
-			sprintf(stringo,"Attempting to reply to %s:\n",cnames[fr]);
+			snprintf(stringo, sizeof(stringo),"Attempting to reply to %s:\n",cnames[fr]);
 			
 		    }
 		    rshow(i,stringo);

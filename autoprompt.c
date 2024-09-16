@@ -1,14 +1,14 @@
 #include "header.h"
 #include "telnet.h"
+#include "globals.h"
+#include <stddef.h>
 
 /****************************************************************************
   FUNCTION - rprint(ch,string);
   Simply writes string to channel ch
  ****************************************************************************/
 
-rprint(i,s)
-int i;
-char *s;
+void rprint(int i, char *s)
 {
     write(i,s,strlen(s));
 }
@@ -17,8 +17,7 @@ char *s;
 /****************************************************************************
  ****************************************************************************/
 
-hideprompt(i)
-int i;
+hideprompt(int i)
 {
     int l;
     users[i].plevel++;
@@ -39,8 +38,7 @@ int i;
 /****************************************************************************
  ****************************************************************************/
 
-showprompt(i)
-int i;
+showprompt(int i)
 {
     --users[i].plevel;
     if (!(users[i].flags&0x000020000)) return;
@@ -61,9 +59,7 @@ int i;
   built into this function.
  ****************************************************************************/
 
-rshow(i,j)
-int i;
-char j[];
+rshow(int i, char j[])
 {
     char outline[2048];
     int sp,ls,pt,lp;

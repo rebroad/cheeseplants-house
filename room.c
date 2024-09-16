@@ -1,4 +1,6 @@
 #include "header.h"
+#include "globals.h"
+#include "functions.h"
 
 /****************************************************************************
  ****************************************************************************/
@@ -50,15 +52,15 @@ int i,r;
 	for (;j!=-1;j=users[j].nextroom) {
 	    if (users[j].ltitle[0]!=0) {
 		if (j!=i) {
-		    (void) sprintf(stringo,"%s %s\n",users[j].name,users[j].ltitle);
+		    (void) snprintf(stringo, sizeof(stringo),"%s %s\n",users[j].name,users[j].ltitle);
 		} else {
-		    (void) sprintf(stringo,"Yourself, %s %s\n",users[j].name,users[j].ltitle);
+		    (void) snprintf(stringo, sizeof(stringo),"Yourself, %s %s\n",users[j].name,users[j].ltitle);
 		}
 	    } else {
 		if (j!=i) {
-		    (void) sprintf(stringo,"%s %s\n",users[j].name,users[j].title);
+		    (void) snprintf(stringo, sizeof(stringo),"%s %s\n",users[j].name,users[j].title);
 		} else {
-		    (void) sprintf(stringo,"Yourself, %s %s\n",users[j].name,users[j].title);
+		    (void) snprintf(stringo, sizeof(stringo),"Yourself, %s %s\n",users[j].name,users[j].title);
 		}
 	    }
 	    rshow(i,stringo);
@@ -143,19 +145,19 @@ int i;
 {
     if (users[i].room==1000000+i) {
 	rshow(i,"You're whisked from your mindscape by a cloud of pink fish!\n");
-	(void) sprintf(stringp,"%s vanishes in a pink whirl.\n",users[i].name);
-	(void) sprintf(stringq,"%s appears, resolving slowly in spinning pink dots.\n",users[i].name);
+	(void) snprintf(stringp, sizeof(stringp),"%s vanishes in a pink whirl.\n",users[i].name);
+	(void) snprintf(stringq, sizeof(stringq),"%s appears, resolving slowly in spinning pink dots.\n",users[i].name);
 	moveuser(i,1,stringp,stringq);
 	return 0;
     }
     rshow(i,"You transfer yourself to your mindscape.\n");
     if (users[i].room<1000000) {
-	(void) sprintf(stringp,"%s dissolves and shoots skywards as a gold spark.\n",users[i].name);
-	(void) sprintf(stringq,"%s forms from a throbbing golden light.\n",users[i].name);
+	(void) snprintf(stringp, sizeof(stringp),"%s dissolves and shoots skywards as a gold spark.\n",users[i].name);
+	(void) snprintf(stringq, sizeof(stringq),"%s forms from a throbbing golden light.\n",users[i].name);
 	moveuser(i,1000000+i,stringp,stringq);
     } else {
-	(void) sprintf(stringp,"%s vanishes with a resounding thud.\n",users[i].name);
-	(void) sprintf(stringq,"%s appears startlingly fast! *Pop!*\n",users[i].name);
+	(void) snprintf(stringp, sizeof(stringp),"%s vanishes with a resounding thud.\n",users[i].name);
+	(void) snprintf(stringq, sizeof(stringq),"%s appears startlingly fast! *Pop!*\n",users[i].name);
 	moveuser(i,1000000+i,stringp,stringq);
     }
     return 0;
@@ -171,8 +173,8 @@ int i;
 	rshow(i,"You cant leave from here!\n");
 	return 0;};
     rshow(i,"You're pulled back down by a powerful force.\n");
-    (void) sprintf(stringp,"%s vanishes through the floor leaving a faint trail of blue feathers.\n",users[i].name);
-    (void) sprintf(stringq,"%s floats down accompanied by some blue birdlike creatures.\n",users[i].name);
+    (void) snprintf(stringp, sizeof(stringp),"%s vanishes through the floor leaving a faint trail of blue feathers.\n",users[i].name);
+    (void) snprintf(stringq, sizeof(stringq),"%s floats down accompanied by some blue birdlike creatures.\n",users[i].name);
     moveuser(i,1,stringp,stringq);
     return 0;
 }
@@ -206,15 +208,15 @@ int i;
 		return 0;}
 	}
     }
-    (void) sprintf(stringo,"You whizz off to %s's mindscape.....\n",users[j].name);
+    (void) snprintf(stringo, sizeof(stringo),"You whizz off to %s's mindscape.....\n",users[j].name);
     rshow(i,stringo);
     if (users[i].room<1000000) {
-	(void) sprintf(stringp,"%s dissolves and shoots skywards as a silver spark.\n",users[i].name);
-	(void) sprintf(stringq,"%s forms from a pulsating silver light.\n",users[i].name);
+	(void) snprintf(stringp, sizeof(stringp),"%s dissolves and shoots skywards as a silver spark.\n",users[i].name);
+	(void) snprintf(stringq, sizeof(stringq),"%s forms from a pulsating silver light.\n",users[i].name);
 	moveuser(i,1000000+j,stringp,stringq);
     } else {
-	(void) sprintf(stringp,"%s disappears 'sideways'??!?.\n",users[i].name);
-	(void) sprintf(stringq,"%s condenses with a nice 'phut' sound.\n",users[i].name);
+	(void) snprintf(stringp, sizeof(stringp),"%s disappears 'sideways'??!?.\n",users[i].name);
+	(void) snprintf(stringq, sizeof(stringq),"%s condenses with a nice 'phut' sound.\n",users[i].name);
 	moveuser(i,1000000+j,stringp,stringq);
     }
     return 0;
@@ -251,8 +253,8 @@ int i;
 	    l=users[j].nextroom;
 	    if ((j!=i)&&(j!=k)) {
 		rshow(j,"You are ejected from the mindscape.\n");
-		(void) sprintf(stringo,"%s vanishes in a burst of orange flame.\n",users[j].name);
-		(void) sprintf(stringp,"%s arrives, smoking ever so slightly.\n",users[j].name);
+		(void) snprintf(stringo, sizeof(stringo),"%s vanishes in a burst of orange flame.\n",users[j].name);
+		(void) snprintf(stringp, sizeof(stringp),"%s arrives, smoking ever so slightly.\n",users[j].name);
 		moveuser(j,j+1000000,stringo,stringp);
 	    }
 	}
@@ -261,7 +263,7 @@ int i;
     }
     if ((j=scanuser(parv[1]))<0) return j;
     if (users[j].room!=(1000000+i)) {
-	(void) sprintf(stringo,"%s is not in your mindscape!\n",users[j].name);
+	(void) snprintf(stringo, sizeof(stringo),"%s is not in your mindscape!\n",users[j].name);
 	rshow(i,stringo);
 	return 0;
     }
@@ -270,11 +272,11 @@ int i;
 	return 0;
     }
     rshow(j,"You are ejected from the mindscape.\n");
-    (void) sprintf(stringo,"%s vanishes in a burst of orange flame.\n",users[j].name);
-    (void) sprintf(stringp,"%s arrives, smoking ever so slightly.\n",users[j].name);
+    (void) snprintf(stringo, sizeof(stringo),"%s vanishes in a burst of orange flame.\n",users[j].name);
+    (void) snprintf(stringp, sizeof(stringp),"%s arrives, smoking ever so slightly.\n",users[j].name);
     moveuser(j,j+1000000,stringo,stringp);
     if (users[i].room!=(1000000+i)) {
-	(void) sprintf(stringo,"%s has been ejected from your mindscape.\n",users[j].name);
+	(void) snprintf(stringo, sizeof(stringo),"%s has been ejected from your mindscape.\n",users[j].name);
 	rshow(i,stringo);
     }
     return 0;
@@ -348,7 +350,7 @@ int i;
 	    rshow(i,"You're in the damn void!!!\n");
 	    return;
 	} else {
-	    (void) sprintf(stringo,"Room number :%d\nRoom name   :%s\nExit Name   :%s\n\n",r,Roomname[r],Roomexit[r]);
+	    (void) snprintf(stringo, sizeof(stringo),"Room number :%d\nRoom name   :%s\nExit Name   :%s\n\n",r,Roomname[r],Roomexit[r]);
 	    rshow(i,stringo);
 	    rshow(i,Roomdesc[r]);
 	    rshow(i,"\n");
@@ -370,11 +372,11 @@ int i;
 	rshow(i,":You cant do that here!!!!\n");
 	return;}
     if (parv[1][0]==0) {
-	(void) sprintf(stringo,"Exitname set to: %s\n",Roomexit[users[i].room]);
+	(void) snprintf(stringo, sizeof(stringo),"Exitname set to: %s\n",Roomexit[users[i].room]);
 	rshow(i,stringo);
     } else {
 	(void) strncpy(Roomexit[users[i].room],parr[1],15);
-	(void) sprintf(stringo,"Exitname now set to: %s\n",Roomexit[users[i].room]);
+	(void) snprintf(stringo, sizeof(stringo),"Exitname now set to: %s\n",Roomexit[users[i].room]);
 	rshow(i,stringo);
     }
     return;
@@ -394,7 +396,7 @@ int i;
     for (;r<MAXROOMS;r++) {
 	if (Roomexit[r][0]!=0) {
 	    s++;
-	    (void) sprintf(stringo,"%2d %-16s:%s\n",r,Roomexit[r],Roomname[r]);
+	    (void) snprintf(stringo, sizeof(stringo),"%2d %-16s:%s\n",r,Roomexit[r],Roomname[r]);
 	    rshow(i,stringo);
 	    if (s==20) return;
 	}
@@ -423,18 +425,18 @@ int i;
     for (j=0;j<MAXEXITS;j++) {
 	if (Exitfrom[j]==users[i].room) {
 	    if ((Exitflags[j]&1)==0) {
-		(void) sprintf(stringo,"go %-16s-> Goto %s\n",Roomexit[Exitto[j]],Roomname[Exitto[j]]);
+		(void) snprintf(stringo, sizeof(stringo),"go %-16s-> Goto %s\n",Roomexit[Exitto[j]],Roomname[Exitto[j]]);
 	    } else {
-		(void) sprintf(stringo,"go %-16s-> Goto %s (LOCKED)\n",Roomexit[Exitto[j]],Roomname[Exitto[j]]);
+		(void) snprintf(stringo, sizeof(stringo),"go %-16s-> Goto %s (LOCKED)\n",Roomexit[Exitto[j]],Roomname[Exitto[j]]);
 	    }
 	    k++;
 	    rshow(i,stringo);
 	} else {
 	    if (Exitto[j]==users[i].room) {
 	    if ((Exitflags[j]&1)==0) {
-		(void) sprintf(stringo,"go %-16s-> Goto %s\n",Roomexit[Exitfrom[j]],Roomname[Exitfrom[j]]);
+		(void) snprintf(stringo, sizeof(stringo),"go %-16s-> Goto %s\n",Roomexit[Exitfrom[j]],Roomname[Exitfrom[j]]);
 	    } else {
-		(void) sprintf(stringo,"go %-16s-> Goto %s (LOCKED)\n",Roomexit[Exitfrom[j]],Roomname[Exitfrom[j]]);
+		(void) snprintf(stringo, sizeof(stringo),"go %-16s-> Goto %s (LOCKED)\n",Roomexit[Exitfrom[j]],Roomname[Exitfrom[j]]);
 	    }
 	    rshow(i,stringo);
 	    k++;
@@ -505,9 +507,9 @@ int i;
 			rshow(i,"That exit is locked!\n");
 			return 0;
 		    } else {
-			(void) sprintf(stringo,"You enter %s\n",Roomname[r]);
-			(void) sprintf(stringp,"%s leaves for %s\n",users[i].name,Roomname[r]);
-			(void) sprintf(stringq,"%s enters.\n",users[i].name);
+			(void) snprintf(stringo, sizeof(stringo),"You enter %s\n",Roomname[r]);
+			(void) snprintf(stringp, sizeof(stringp),"%s leaves for %s\n",users[i].name,Roomname[r]);
+			(void) snprintf(stringq, sizeof(stringq),"%s enters.\n",users[i].name);
 			rshow(i,stringo);
 			moveuser(i,r,stringp,stringq);
 			return 0;
@@ -518,9 +520,9 @@ int i;
 			    rshow(i,"That exit is locked!\n");
 			    return 0;
 			} else {
-			    (void) sprintf(stringo,"You enter %s\n",Roomname[r]);
-			    (void) sprintf(stringp,"%s leaves for %s\n",users[i].name,Roomname[r]);
-			    (void) sprintf(stringq,"%s enters.\n",users[i].name);
+			    (void) snprintf(stringo, sizeof(stringo),"You enter %s\n",Roomname[r]);
+			    (void) snprintf(stringp, sizeof(stringp),"%s leaves for %s\n",users[i].name,Roomname[r]);
+			    (void) snprintf(stringq, sizeof(stringq),"%s enters.\n",users[i].name);
 			    rshow(i,stringo);
 			    moveuser(i,r,stringp,stringq);
 			    return 0;

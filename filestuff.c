@@ -1,6 +1,8 @@
 #include <sys/mman.h>
 #include <unistd.h>
 #include "header.h"
+#include "globals.h"
+#include "functions.h"
 #define BLOCKSIZE 256
 #define BLOCKNUM 10
 
@@ -31,6 +33,11 @@ inline static void SETENTRY(int n, int v) {
 
 initfiles()
 {
+    if (mkdir("Data", 0755) == -1 && errno != EEXIST) {
+        perror("Failed to create Data directory");
+        exit(1);
+    }
+
     int i;
     if ((cptr=open(DCATFILE,O_RDONLY))==-1) {
 	if ((cptr=open(DCATFILE,O_CREAT|O_WRONLY,-1))==-1) {
@@ -224,7 +231,7 @@ int n;
 	index=getint(dptr);
 	if ((index<-1)||(count==BLOCKNUM)) return count;
 	if (n!=(tn=getint(dptr))) {
-	    (void) sprintf(stringo,"Inconsistancy!! Pos:%d Use:%d Is:%d\n",oindex,n,tn);
+	    (void) snprintf(stringo, sizeof(stringo),"Inconsistancy!! Pos:%d Use:%d Is:%d\n",oindex,n,tn);
 	    Logfile(stringo);};
 	(void) read(dptr,&filebuffer[posn],BLOCKSIZE-8);
     }
@@ -394,8 +401,8 @@ int n,typ;
     loadstring(users[n].scapedesc);
     if ((users[n].flags&2)==0) (void) strcpy(users[n].title,"the resident.");
     if ((users[n].flags&8)==0) (void) strcpy(users[n].prompt,"-=> ");
-    if ((users[n].flags&128)==0) (void) sprintf(users[n].scapename,"the mindscape of %s.",cnames[users[n].number]);
-    if ((users[n].flags&128)==0) (void) sprintf(users[n].scapedesc,"This is %s's mindscape.",cnames[users[n].number]);
+    if ((users[n].flags&128)==0) (void) snprintf(users[n].scapename, sizeof(users[n].scapename),"the mindscape of %s.",cnames[users[n].number]);
+    if ((users[n].flags&128)==0) (void) snprintf(users[n].scapedesc, sizeof(users[n].scapedesc),"This is %s's mindscape.",cnames[users[n].number]);
     return;
 }
 
@@ -449,9 +456,9 @@ int i;
     rshow(i,"Ok then.... file data on its way...\n");
     f=filefree();
     s=GETENTRY(0);
-    (void) sprintf(stringo,"Database size : %d p-sectors %d(%d) K\n",s,s/4,(s*256)/1000);
+    (void) snprintf(stringo, sizeof(stringo),"Database size : %d p-sectors %d(%d) K\n",s,s/4,(s*256)/1000);
     rshow(i,stringo);
-    (void) sprintf(stringo,"Free memory   : %d p-sectors %d K\n\n",f,f/4);
+    (void) snprintf(stringo, sizeof(stringo),"Free memory   : %d p-sectors %d K\n\n",f,f/4);
     rshow(i,stringo);
     if (parv[1][0]==0) return 0;
     rshow(i,"User specific requests not yet enabled... sorry.");
@@ -582,7 +589,7 @@ int i;
     int n,c;
     for (c=0,n=0;n<MAXUSERS;n++)
 	if (GETENTRY(n+2)!=-1) c++;
-    (void) sprintf(stringo,"Users with database entries: %d.\n",c);
+    (void) snprintf(stringo, sizeof(stringo),"Users with database entries: %d.\n",c);
     rshow(i,stringo);
 }
 

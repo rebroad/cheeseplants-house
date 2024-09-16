@@ -1,4 +1,6 @@
 #include "header.h"
+#include "globals.h"
+#include "functions.h"
 
 /****************************************************************************
   FUNCTION - help(chan)

@@ -1,5 +1,7 @@
 #include "header.h"
+#include "globals.h"
 #include "telnet.h"
+#include "functions.h"
 
 int     charactercount;
 int     mysocket;
@@ -87,9 +89,9 @@ dosocket()
         }
 	if (j>=0) {
             if(rdfiled[0] & (1 << mysocket))  {
-		pstatus("Cheeseplants House: Connecting");
+		//pstatus("Cheeseplants House: Connecting");
                 (void) DoConnect();
-		pstatus("Cheeseplants House: Serving");
+		//pstatus("Cheeseplants House: Serving");
 	    }
             for(i=0;i<MOST;i++)
                 if(i!=mysocket &&(rdfiled[i/32] & ( 1<<(i&31) ))) {
@@ -188,7 +190,7 @@ DoConnect()
     }  else {
 	int before;
 	(void) time((time_t*)&before);
-	pstatus("Cheeseplants House: Connecting: Nameserve");
+	//pstatus("Cheeseplants House: Connecting: Nameserve");
 	j=gethostbyaddr((char*)&connectaddress.sin_addr,cadlen,AF_INET);
 	(void) time((time_t*)&ti);
 	if ((ti-before)>15) houseflags|=1;
@@ -209,7 +211,7 @@ DoConnect()
         (void) strncpy(hostname,j->h_name,63);
         hostname[63]=0;
     } else {
-	(void) sprintf(stringo,"%d.%d.%d.%d %d",a,b,c,d,connectaddress.sin_port);
+	(void) snprintf(stringo, sizeof(stringo),"%d.%d.%d.%d %d",a,b,c,d,connectaddress.sin_port);
 	(void) strncpy(hostname,stringo,63);
     }
     {
@@ -318,7 +320,7 @@ DoConnect()
 	    Lassusers++;
 	    (void) time((time_t*)&ti);
 	    if (Lassusers>Maxlassusers) {
-		sprintf(stringo,"There are too many logins via LASS at present.\nPlease do not retry within the next %d seconds.\nAny try before then will start the timer again so wont get in.\n",lasswait+39);
+		snprintf(stringo, sizeof(stringo),"There are too many logins via LASS at present.\nPlease do not retry within the next %d seconds.\nAny try before then will start the timer again so wont get in.\n",lasswait+39);
 		rshow(path,stringo);
 		rshow(path,"This is due to high loads on LASS caused by people repeatedly trying to log\nin using function keys and the like, you have them to thank.\n");
 		lasstime=ti;
@@ -331,7 +333,7 @@ DoConnect()
 		return 0;
 	    }
 	    if ((ti-lasstime)<lasswait) {
-		sprintf(stringo,"Due to use of function keys to repeatedly try to log in here\nLASS has been frequently overloaded, therefore the house will not accept any\nlogins from LASS within the next %d seconds.\nAn attempt by anyone within this time will reset the time again.\n",lasswait+19);
+		snprintf(stringo, sizeof(stringo),"Due to use of function keys to repeatedly try to log in here\nLASS has been frequently overloaded, therefore the house will not accept any\nlogins from LASS within the next %d seconds.\nAn attempt by anyone within this time will reset the time again.\n",lasswait+19);
 		rshow(path,stringo);
 		lasstime=(ti+lasstime)/2;
 		Lassusers--;
@@ -413,7 +415,7 @@ int i;
 	    case -15: TLog(i,"NO-OPERATION");break;
 	    case -16: TLog(i,"END SUBNEGOTIATION!!!!");break;
 	    default:
-		(void) sprintf(stringp,"IAC CHARACTER %d.\n",(int) c);
+		(void) snprintf(stringp, sizeof(stringp),"IAC CHARACTER %d.\n",(int) c);
 		TLog(i,stringp);
 	    }
 	    tstate[i]=0;
@@ -429,7 +431,7 @@ int i;
 	    return 0;
 	}
 	if (c<0) {
-	    (void) sprintf(stringp,"ILLEGAL CHARACTER %d (=%d).\n",(int) c,((int)c)+256);
+	    (void) snprintf(stringp, sizeof(stringp),"ILLEGAL CHARACTER %d (=%d).\n",(int) c,((int)c)+256);
 	    TLog(i,stringp);
 	}
         c&=127;
@@ -483,9 +485,9 @@ int   path;
     }
     if (users[path].number>-1) {
 	if (users[path].doing<1000) {
-	    (void) sprintf(stringo,"%s leaves the house.\n",users[path].name);
+	    (void) snprintf(stringo, sizeof(stringo),"%s leaves the house.\n",users[path].name);
 	    moveuser(path,0,stringo,"");
-	    (void) sprintf(stringo,"\007\007%s has left the house.\n",users[path].name);
+	    (void) snprintf(stringo, sizeof(stringo),"\007\007%s has left the house.\n",users[path].name);
 	    for (i=Firstuser;i!=-1;i=users[i].nextuser) 
 		if ((i!=path)&&(users[i].doing<1000)) {
 		    int k,f;
@@ -519,12 +521,12 @@ int   path;
 			users[path].invitenum[i]=-1;
 			users[path].inviteflags[i]=0;
 		    }
-	(void) sprintf(stringp,"%s has logged out so the mindscape vanishes.\n",users[path].name);
+	(void) snprintf(stringp, sizeof(stringp),"%s has logged out so the mindscape vanishes.\n",users[path].name);
 	for (i=users[path].scapeuser;i!=-1;i=n) {
 	    n=users[i].nextroom;
 	    if (i!=path) {
 		rshow(i,stringp);
-		(void) sprintf(stringq,"%s arrives amidst a shower of sparks.\n",users[i].name);
+		(void) snprintf(stringq, sizeof(stringq),"%s arrives amidst a shower of sparks.\n",users[i].name);
 		moveuser(i,1000000+i,"",stringq);
 	    }
 	}
@@ -624,10 +626,10 @@ int i;
     char c;
     char prstat[80];
     if (users[i].number<0) {
-	pstatus("Cheeseplants House: Processing: -- Unknown --");
+	//pstatus("Cheeseplants House: Processing: -- Unknown --");
     } else {
-	sprintf(prstat,"Cheeseplants House: Processing: %s",users[i].name);
-	pstatus(prstat);
+	snprintf(prstat, sizeof(prstat),"Cheeseplants House: Processing: %s",users[i].name);
+	//pstatus(prstat);
     }
     (void) time((time_t*)&ti);
     users[i].idletime=ti;
@@ -753,9 +755,9 @@ char *s;
 {
     int j;
     if (users[i].number<0) {
-	(void) sprintf(stringo,"(%.3d) --- Unknown! --- %s\n",i,s);
+	(void) snprintf(stringo, sizeof(stringo),"(%.3d) --- Unknown! --- %s\n",i,s);
     } else {
-	(void) sprintf(stringo,"(%.3d) %-16s %s\n",i,users[i].name,s);
+	(void) snprintf(stringo, sizeof(stringo),"(%.3d) %-16s %s\n",i,users[i].name,s);
     }
     if (houseflags&2) {
 	for (j=Firstuser;j!=-1;j=users[j].nextuser)
@@ -808,7 +810,7 @@ char c;
 	    default:
 		(void) strcpy(stringp,"Subneg ");
 		for (u=0;u<tsposn[i];u++) {
-		    (void) sprintf(stringo,"%d ",(int) tsbuff[i][u]);
+		    (void) snprintf(stringo, sizeof(stringo),"%d ",(int) tsbuff[i][u]);
 		    (void) strcat(stringp,stringo);
 		}
 		(void) strcat(stringp,"\n");
@@ -816,7 +818,7 @@ char c;
 		(void) strcpy(stringp,"ASCII ");
 		for (u=0;u<tsposn[i];u++) {
 		    if ((tsbuff[i][u]<' ')||(tsbuff[i][u]>'~')) tsbuff[i][u]='.';
-		    (void) sprintf(stringo,"%c",tsbuff[i][u]);
+		    (void) snprintf(stringo, sizeof(stringo),"%c",tsbuff[i][u]);
 		    (void) strcat(stringp,stringo);
 		}
 		(void) strcat(stringp,"\n");
@@ -949,7 +951,7 @@ char c;
     case 34:TMsg(s,"LINEMODE");break;
     case 35:TMsg(s,"X-DISPLAY");break;
     default:
-	(void) sprintf(stringp,"%s %d.",s,(int)c);
+	(void) snprintf(stringp, sizeof(stringp),"%s %d.",s,(int)c);
     }
     TLog(i,stringp);
 }
@@ -960,7 +962,7 @@ char c;
 TMsg(s,t)
 char *s,*t;
 {
-    (void) sprintf(stringp,"%s %s",s,t);
+    (void) snprintf(stringp, sizeof(stringp),"%s %s",s,t);
 }
 
 /****************************************************************************
@@ -1000,9 +1002,9 @@ int i;
 	if ((j=scanuser(parv[1]))<0) return j;
 	t=ti-startthro[j];
 	if (users[j].number<0) {
-		sprintf(stringo,"%.3d ---------------- %8d %f char/sec\n",j,through[j],(double) through[j]/t);
+		snprintf(stringo, sizeof(stringo),"%.3d ---------------- %8d %f char/sec\n",j,through[j],(double) through[j]/t);
 	    } else {
-		sprintf(stringo,"%.3d %-16s %8d %f char/sec\n",j,users[j].name,through[j],(double) through[j]/t);
+		snprintf(stringo, sizeof(stringo),"%.3d %-16s %8d %f char/sec\n",j,users[j].name,through[j],(double) through[j]/t);
 	}	    
 	if (parv[2][0]=='-') {
 	    time((time_t*)&startthro[j]);
@@ -1015,9 +1017,9 @@ int i;
 	if (through[j]>0) {
 	    t=ti-startthro[j];
 	    if (users[j].number<0) {
-		sprintf(stringo,"%.3d ---------------- %8d %f char/sec\n",j,through[j],(double) through[j]/t);
+		snprintf(stringo, sizeof(stringo),"%.3d ---------------- %8d %f char/sec\n",j,through[j],(double) through[j]/t);
 	    } else {
-		sprintf(stringo,"%.3d %-16s %8d %f char/sec\n",j,users[j].name,through[j],(double) through[j]/t);
+		snprintf(stringo, sizeof(stringo),"%.3d %-16s %8d %f char/sec\n",j,users[j].name,through[j],(double) through[j]/t);
 	    }	    
 	    rshow(i,stringo);
 	}

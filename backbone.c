@@ -1,4 +1,6 @@
 #include "header.h"
+#include "globals.h"
+#include "functions.h"
 
 /****************************************************************************
   FUNCTION - rshow(ch,string);
@@ -212,7 +214,7 @@ announce(i)
 int i;
 {
     int j;
-    (void)sprintf(stringo,"\007\007%s has entered the house.\n",users[i].name);
+    (void)snprintf(stringo, sizeof(stringo),"\007\007%s has entered the house.\n",users[i].name);
     for (j=Firstuser;j!=-1;j=users[j].nextuser) 
 	if ((j!=i)&&(users[j].doing<1000)) {
 	    int k;
@@ -292,7 +294,7 @@ char *s;
     case 6 : (void) strcpy(day,"Sat");break;
     case 7 : (void) strcpy(day,"Sun");break;
     }
-    (void) sprintf(s,"%.2d:%.2d-%.2d %s %.2d/%.2d/%d",whattime->tm_hour,whattime->tm_min,whattime->tm_sec,day,whattime->tm_mday,whattime->tm_mon+1,whattime->tm_year%100);
+    (void) snprintf(s, sizeof(s),"%.2d:%.2d-%.2d %s %.2d/%.2d/%d",whattime->tm_hour,whattime->tm_min,whattime->tm_sec,day,whattime->tm_mday,whattime->tm_mon+1,whattime->tm_year%100);
 }
 
 /****************************************************************************
@@ -312,7 +314,7 @@ char *s;
     int da,ho,mi,se;
     char ses[10],mis[10],hos[10],das[20];
     if (t<=0) {
-	(void) sprintf(s,"less than a second");
+	(void) snprintf(s, sizeof(s),"less than a second");
 	return;};
     se=t%60;
     mi=t/60;
@@ -323,24 +325,24 @@ char *s;
     switch (se) {
     case 0 : ses[0]=0;break;
     case 1 : strcpy(ses,"1 Second");break;
-    default: sprintf(ses,"%d Seconds",se);break;
+    default: snprintf(ses, sizeof(ses),"%d Seconds",se);break;
     }
     switch (mi) {
     case 0 : mis[0]=0;break;
     case 1 : strcpy(mis,"1 Minute ");break;
-    default: sprintf(mis,"%d Minutes ",mi);break;
+    default: snprintf(mis, sizeof(mis),"%d Minutes ",mi);break;
     }
     switch (ho) {
     case 0 : hos[0]=0;break;
     case 1 : strcpy(hos,"1 Hour ");break;
-    default: sprintf(hos,"%d Hours ",ho);break;
+    default: snprintf(hos, sizeof(hos),"%d Hours ",ho);break;
     }
     switch (da) {
     case 0 : das[0]=0;break;
     case 1 : strcpy(das,"1 Day ");break;
-    default: sprintf(das,"%d Days ",da);break;
+    default: snprintf(das, sizeof(das),"%d Days ",da);break;
     }
-    sprintf(s,"%s%s%s%s",das,hos,mis,ses);
+    snprintf(s, sizeof(s),"%s%s%s%s",das,hos,mis,ses);
     if (s[strlen(s)-1]==' ') s[strlen(s)-1]=0;
     return;
 }

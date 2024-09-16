@@ -1,4 +1,6 @@
 #include "header.h"
+#include "globals.h"
+#include "functions.h"
 
 /* This is for my stat command, give it a .c file all of its own... */
 
@@ -84,46 +86,46 @@ int i,r;
 {
     rshow(i,"  ----------------------------------------------------------------------------\n");
     if (users[r].flags&1) {
-	sprintf(stringo,"Status of resident user [%d]:\n%s %s\n",users[r].number,users[r].name,users[r].title);
+	snprintf(stringo, sizeof(stringo),"Status of resident user [%d]:\n%s %s\n",users[r].number,users[r].name,users[r].title);
     } else {
-	sprintf(stringo,"Status of user [%d]:\n%s %s\n",users[r].number,users[r].name,users[r].title);
+	snprintf(stringo, sizeof(stringo),"Status of user [%d]:\n%s %s\n",users[r].number,users[r].name,users[r].title);
     }
     rshow(i,stringo);
     if (r!=255) {
 	if (users[r].ltitle[0]==0) {
 	    rshow(i,"No local title set\n");
 	} else {
-	    sprintf(stringo,"%s %s\n",users[r].name,users[r].ltitle);
+	    snprintf(stringo, sizeof(stringo),"%s %s\n",users[r].name,users[r].ltitle);
 	    rshow(i,stringo);
 	}
     }
-    sprintf(stringo,"Description....\n%s\n\n",users[r].desc);
+    snprintf(stringo, sizeof(stringo),"Description....\n%s\n\n",users[r].desc);
     rshow(i,stringo);
-    sprintf(stringo,"Email Addr:%s\nMy Comment:%s\n\n",users[r].email,users[r].comment);
+    snprintf(stringo, sizeof(stringo),"Email Addr:%s\nMy Comment:%s\n\n",users[r].email,users[r].comment);
     rshow(i,stringo);
     if (r!=255) {
-	sprintf(stringo,"Number    :%.3d.%.3d.%.3d.%.3d %d\nHost      :%s\nTerminal  :%s\n\n",users[r].ina[0],users[r].ina[1],users[r].ina[2],users[r].ina[3],users[r].ina[4],users[r].host,users[r].tty);
+	snprintf(stringo, sizeof(stringo),"Number    :%.3d.%.3d.%.3d.%.3d %d\nHost      :%s\nTerminal  :%s\n\n",users[r].ina[0],users[r].ina[1],users[r].ina[2],users[r].ina[3],users[r].ina[4],users[r].host,users[r].tty);
 	rshow(i,stringo);
     }
     (void) time((time_t*)&ti);
     ltimestr(ti-users[r].agetime,stringp);
     ltimestr(users[r].age+ti-users[r].agetime,stringq);
     if (r!=255) {
-	sprintf(stringo,"Login time (this) :%s\n",stringp);
+	snprintf(stringo, sizeof(stringo),"Login time (this) :%s\n",stringp);
 	rshow(i,stringo);
     }
-    sprintf(stringo,"Login time (total):%s\n",stringq);
+    snprintf(stringo, sizeof(stringo),"Login time (total):%s\n",stringq);
     rshow(i,stringo);
     ltimestr(ti-users[r].lastlogin,stringp);
     ltimestr(ti-users[r].idletime,stringq);
     if (r!=255) {
-	sprintf(stringo,"Login time (log)  :%s\n",stringp);
+	snprintf(stringo, sizeof(stringo),"Login time (log)  :%s\n",stringp);
 	rshow(i,stringo);
-	sprintf(stringo,"Pressed return    :%s\n",stringq);
+	snprintf(stringo, sizeof(stringo),"Pressed return    :%s\n",stringq);
 	rshow(i,stringo);
     }
     ltimestr(SHOUTTIME-(ti-lastshout[users[r].number]),stringp);
-    (void) sprintf(stringo,"Shouts %d/%d. Next shout in %s.\n",shouts[users[r].number],SHOUTMAX,stringp);
+    (void) snprintf(stringo, sizeof(stringo),"Shouts %d/%d. Next shout in %s.\n",shouts[users[r].number],SHOUTMAX,stringp);
     rshow(i,stringo);
     if (shouts[users[r].number]>=SHOUTMAX) 
 	rshow(i,"Time listed about is in effect... *** SORE THROAT ***\n");
@@ -131,7 +133,7 @@ int i,r;
 	if (users[r].leaving<0) {
 	    rshow(i,"They're going to be logged out very soon.\n");
 	} else {
-	    sprintf(stringo,"They're going to be logged out in about %d minutes.\n",users[r].leaving/60+1);
+	    snprintf(stringo, sizeof(stringo),"They're going to be logged out in about %d minutes.\n",users[r].leaving/60+1);
 	    rshow(i,stringo);
 	}
     rshow(i,"  ----------------------------------------------------------------------------\n");
@@ -146,9 +148,9 @@ int i,r;
 {
     rshow(i,"  ----------------------------------------------------------------------------\n");
     if (users[r].flags&1) {
-	sprintf(stringo,"Flag status of resident user [%d]: %s\n\n",users[r].number,users[r].name);
+	snprintf(stringo, sizeof(stringo),"Flag status of resident user [%d]: %s\n\n",users[r].number,users[r].name);
     } else {
-	sprintf(stringo,"Flag status of user [%d]: %s\n\n",users[r].number,users[r].name);
+	snprintf(stringo, sizeof(stringo),"Flag status of user [%d]: %s\n\n",users[r].number,users[r].name);
     }
     rshow(i,stringo);
     rshow(i,"Command flags settings:\n");
@@ -234,15 +236,15 @@ int i;
     int j;
     rshow(i,"  ----------------------------------------------------------------------------\n");
     if (users[r].objecting!=-1) {
-	sprintf(stringo,"Objecting to :%s.\n   %s\n",users[users[r].objecting].name,users[r].objection);
+	snprintf(stringo, sizeof(stringo),"Objecting to :%s.\n   %s\n",users[users[r].objecting].name,users[r].objection);
 	rshow(i,stringo);
     }
     for (j=0;j<OBJECTNUM;j++)
 	if (users[r].objected[j]!=-1) {
-	    sprintf(stringo,"  Objection from:%s\n",cnames[users[r].objected[j]]);
+	    snprintf(stringo, sizeof(stringo),"  Objection from:%s\n",cnames[users[r].objected[j]]);
 	    rshow(i,stringo);
 	}
-    sprintf(stringo,"Ignore Message:%s",users[r].ignoremsg);
+    snprintf(stringo, sizeof(stringo),"Ignore Message:%s",users[r].ignoremsg);
     rshow(i,stringo);
     rshow(i,"  ----------------------------------------------------------------------------\n");
     return 0;

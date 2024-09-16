@@ -1,6 +1,8 @@
 #include "header.h"
+#include "globals.h"
 #include <sys/mman.h>
 #include <unistd.h>
+#include "functions.h"
 
 /****************************************************************************
   FUNCTION - crashme(chan)
@@ -15,7 +17,7 @@ int i;
     /*Ok, do this properly.... */
     (void) time((time_t*)&ti);
     timestr(ti,stringp);
-    (void) sprintf(stringo,"%s: --------------- CRASHED %s ---------------\n",stringp,users[i].name);
+    (void) snprintf(stringo, sizeof(stringo),"%s: --------------- CRASHED %s ---------------\n",stringp,users[i].name);
     Logfile(stringo);
     for (i=0;i<MOST;i++) {
 	if (users[i].doing!=0) {
@@ -84,13 +86,13 @@ int i;
 	}
     if ((users[j].flags&0x200)!=0) {
 	rshow(i,"You must be JOKING!\n");
-	(void) sprintf(stringo,"%s tried to evict you just then!\nReason: %s\n",users[i].name,parr[2]);
+	(void) snprintf(stringo, sizeof(stringo),"%s tried to evict you just then!\nReason: %s\n",users[i].name,parr[2]);
 	rshow(j,stringo);
 	return 0;
     }
     (void) time((time_t*)&ti);
     timestr(ti,stringp);
-    (void) sprintf(stringo,"%s: %s evicted by %s - %s\n",stringp,users[j].name,users[i].name,parr[2]);
+    (void) snprintf(stringo, sizeof(stringo),"%s: %s evicted by %s - %s\n",stringp,users[j].name,users[i].name,parr[2]);
     Logfile(stringo);
     rshow(j,"You have been evicted.\n");
     LostConnect(j);
@@ -115,17 +117,17 @@ int i;
 	return 0;
     }
     if ((users[j].flags&0x200)!=0) {
-	(void) sprintf(stringo,"%s just traced you!\nReason: %s\n",users[i].name,parr[2]);
+	(void) snprintf(stringo, sizeof(stringo),"%s just traced you!\nReason: %s\n",users[i].name,parr[2]);
 	rshow(j,stringo);
     }
     (void) time((time_t*)&ti);
     timestr(ti,stringp);
-    (void) sprintf(stringo,"%s: %s traced by %s - %s\n",stringp,users[j].name,users[i].name,parr[2]);
+    (void) snprintf(stringo, sizeof(stringo),"%s: %s traced by %s - %s\n",stringp,users[j].name,users[i].name,parr[2]);
     Logfile(stringo);
     if (users[j].logintype==2) {
-	sprintf(stringo,"%s is calling from %s <%d>\n",users[j].name,users[j].host,users[j].ina[4]);
+	snprintf(stringo, sizeof(stringo),"%s is calling from %s <%d>\n",users[j].name,users[j].host,users[j].ina[4]);
     } else {
-	sprintf(stringo,"%s is calling from %s\n",users[j].name,users[j].host);
+	snprintf(stringo, sizeof(stringo),"%s is calling from %s\n",users[j].name,users[j].host);
     }
     rshow(i,stringo);
     return 0;
@@ -171,7 +173,7 @@ int i;
     (void) lseek(h,0L,SEEK_END);
     (void) time((time_t*)&ti);
     timestr(ti,stringp);
-    sprintf(stringo,"%-16s%-24s from %s (%d)\n",cnames[users[i].number],stringp,users[i].host,users[i].ina[4]);
+    snprintf(stringo, sizeof(stringo),"%-16s%-24s from %s (%d)\n",cnames[users[i].number],stringp,users[i].host,users[i].ina[4]);
     (void) write(h,stringo,strlen(stringo));
     (void) close(h);
     return;
@@ -197,7 +199,7 @@ int i;
 	rshow(i,"That table is empty...\n");
 	return 0;}
     for(j=nhash[j];j!=-1;j=nnext[j]) {
-	sprintf(stringo,"%.5d %16s (%d > %d)\n",j,cnames[j],nlast[j],nnext[j]);
+	snprintf(stringo, sizeof(stringo),"%.5d %16s (%d > %d)\n",j,cnames[j],nlast[j],nnext[j]);
 	rshow(i,stringo);
     }
     return 0;
@@ -288,7 +290,7 @@ int i;
     for(j=0;j<16;j++) hostname[k]=0;
     (void) strncpy(hostname,h->h_name,63);
     hostname[63]=0;
-    sprintf(stringo,"%s located as coming from %s.\n",users[k].name,hostname);
+    snprintf(stringo, sizeof(stringo),"%s located as coming from %s.\n",users[k].name,hostname);
     rshow(i,stringo);
     strcpy(users[k].host,hostname);
     return 0;
@@ -298,23 +300,13 @@ int i;
   FUNCTION - pstatus(string);
   Sets the ps x status string to string;
  ****************************************************************************/
-/*
-pstatus(s)
-char *s;
-{
+pstatus(char *s) {
     int n,m,t;
     m=strlen(argles);
     t=strlen(s);
     if (m<t) s[m]=0;
     for (n=0;n<t;n++) argles[n]=s[n];
     for (;n<m;n++) argles[n]=32;
-}
-*/
-
-pstatus(s)
-char *s;
-{
-    return;
 }
 
 /****************************************************************************
@@ -325,7 +317,7 @@ dumpnotices()
     int h,i;
     if ((h=open(NOTCFILE,O_CREAT|O_WRONLY|O_TRUNC,-1))==-1) return;
     for(i=0;(i<MAXNOTICES)&&(noticenum[i]!=-1);i++) {
-	(void) sprintf(stringo,"%-15s:%s\n",unames[noticenum[i]],noticemsg[i]);
+	(void) snprintf(stringo, sizeof(stringo),"%-15s:%s\n",unames[noticenum[i]],noticemsg[i]);
 	(void) write(h,stringo,strlen(stringo));
     }
     (void) close(h);
