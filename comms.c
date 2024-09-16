@@ -1,4 +1,6 @@
 #include "header.h"
+#include "globals.h"
+#include "functions.h"
 
 /****************************************************************************
  ****************************************************************************/
@@ -13,7 +15,7 @@ char *s;
 	int k;
 	(void) strcpy(ekko,s);
 	for (k=strlen(ekko)-1;(k!=0)&&(ekko[k]!='\n');k--);
-	(void) sprintf(&ekko[k],"<<%s\n",users[i].name);
+	(void) snprintf(&ekko[k], sizeof(&ekko[k]),"<<%s\n",users[i].name);
     }
     if (s==0) return;
     /* who room str type ig1 ig2 ig3 */
@@ -52,7 +54,7 @@ char *s;
 	int k;
 	(void) strcpy(ekko,s);
 	for (k=strlen(ekko)-1;(k!=0)&&(ekko[k]!='\n');k--);
-	(void) sprintf(&ekko[k],"<<%s\n",users[i].name);
+	(void) snprintf(&ekko[k], sizeof(&ekko[k]),"<<%s\n",users[i].name);
     }
     if (s==0) return;
     /* who room str type ig1 ig2 ig3 */
@@ -102,9 +104,9 @@ int i;
     if ((users[i].flags&0x800)!=0) {
 	rshow(i,"You cant talk through the gag!\n");
 	return 0;}
-    (void) sprintf(stringo,"=%s says \"%s\"\n",users[i].name,parr[1]);
+    (void) snprintf(stringo, sizeof(stringo),"=%s says \"%s\"\n",users[i].name,parr[1]);
     rsayb(i,users[i].room,stringo,1,i,-1,-1);
-    (void) sprintf(stringo,"You say \"%s\"\n",parr[1]);
+    (void) snprintf(stringo, sizeof(stringo),"You say \"%s\"\n",parr[1]);
     rshow(i,stringo);
     return 0;
 }
@@ -174,20 +176,20 @@ int i;
 		}
 		l++;
 	    }
-	    (void) sprintf(stringq,"-%s %s\n",users[i].name,parr[1]);
-	    (void) sprintf(stringo,"=%s %s\n",users[i].name,stringp);
+	    (void) snprintf(stringq, sizeof(stringq),"-%s %s\n",users[i].name,parr[1]);
+	    (void) snprintf(stringo, sizeof(stringo),"=%s %s\n",users[i].name,stringp);
 	    rsayb(i,users[i].room,stringo,2,i,j,-1);
 	    rtell(j,stringq);
-	    (void) sprintf(stringp,"You emote: %s&  remote: %s",&stringo[1],&stringq[1]);
+	    (void) snprintf(stringp, sizeof(stringp),"You emote: %s&  remote: %s",&stringo[1],&stringq[1]);
 	    rshow(i,stringp);
 	    return 0;
 	}
 	parr[1][l]=0;
 	break;
     }
-    (void) sprintf(stringo,"=%s %s\n",users[i].name,parr[1]);
+    (void) snprintf(stringo, sizeof(stringo),"=%s %s\n",users[i].name,parr[1]);
     rsayb(i,users[i].room,stringo,2,i,-1,-1);
-    (void) sprintf(stringo,"You emote: %s %s\n",users[i].name,parr[1]);
+    (void) snprintf(stringo, sizeof(stringo),"You emote: %s %s\n",users[i].name,parr[1]);
     rshow(i,stringo);
     return 0;
 }
@@ -211,13 +213,13 @@ int i;
 		return 0;
 	    }
     if (!shielded(i,j)) {
-	(void) sprintf(stringo,"You tell %s: %s\n",users[j].name,parr[2]);
+	(void) snprintf(stringo, sizeof(stringo),"You tell %s: %s\n",users[j].name,parr[2]);
 	rshow(i,stringo);
-	(void) sprintf(stringo,">%s tells you: %s\n",users[i].name,parr[2]);
+	(void) snprintf(stringo, sizeof(stringo),">%s tells you: %s\n",users[i].name,parr[2]);
 	rtell(j,stringo);
 	return 0;
     }
-    (void) sprintf(stringo,"%s is shielded from tells and remotes.\n",users[j].name);
+    (void) snprintf(stringo, sizeof(stringo),"%s is shielded from tells and remotes.\n",users[j].name);
     rshow(i,stringo);
     return 0;
 }
@@ -249,13 +251,13 @@ int i;
 	    }
 	}
     if (!shielded(i,j)) {
-	(void) sprintf(stringo,"You remote: %s %s\n",users[i].name,parr[2]);
+	(void) snprintf(stringo, sizeof(stringo),"You remote: %s %s\n",users[i].name,parr[2]);
 	rshow(i,stringo);
-	(void) sprintf(stringo,">%s %s\n",users[i].name,parr[2]);
+	(void) snprintf(stringo, sizeof(stringo),">%s %s\n",users[i].name,parr[2]);
 	rtell(j,stringo);
 	return 0;
     }
-    (void) sprintf(stringo,"%s is shielded from tells and remotes.\n",users[j].name);
+    (void) snprintf(stringo, sizeof(stringo),"%s is shielded from tells and remotes.\n",users[j].name);
     rshow(i,stringo);
     return 0;
 }
@@ -286,24 +288,24 @@ int i;
 	if (strcmp(unames[users[i].number],parv[2])!=0) {
 	    for (k=0;k<MAXUSERS;k++)
 		if (strcmp(unames[k],parv[2])==0) {
-		    (void) sprintf(stringo,"%s echoto's :%s\n",users[i].name,parr[2]);
+		    (void) snprintf(stringo, sizeof(stringo),"%s echoto's :%s\n",users[i].name,parr[2]);
 		    rshow(j,stringo);
-		    (void) sprintf(stringo,"You sorta echoto \'%s\'\n",parr[2]);
+		    (void) snprintf(stringo, sizeof(stringo),"You sorta echoto \'%s\'\n",parr[2]);
 		    rshow(i,stringo);
 		    return 0;
 		}
 	}
-        (void) sprintf(stringo,"You echoto: %s\n",parr[2]);
+        (void) snprintf(stringo, sizeof(stringo),"You echoto: %s\n",parr[2]);
         rshow(i,stringo);
 	if ((users[j].flags&0x400000)==0) {
-	    (void) sprintf(stringo,"%s\n",parr[2]);
+	    (void) snprintf(stringo, sizeof(stringo),"%s\n",parr[2]);
 	} else {
-	    (void) sprintf(stringo,"%s<<-%s\n",parr[2],users[i].name);
+	    (void) snprintf(stringo, sizeof(stringo),"%s<<-%s\n",parr[2],users[i].name);
 	}
         rshow(j,stringo);
         return 0;
     }
-    (void) sprintf(stringo,"%s is shielded.\n",users[j].name);
+    (void) snprintf(stringo, sizeof(stringo),"%s is shielded.\n",users[j].name);
     rshow(i,stringo);
     return 0;
 }
@@ -325,16 +327,16 @@ int i;
     if (strcmp(unames[users[i].number],parv[1])!=0) {
 	for (j=0;j<MAXUSERS;j++)
 	    if (strcmp(unames[j],parv[1])==0) {
-		(void) sprintf(stringo,"=%s echoes :%s\n",users[i].name,parr[1]);
+		(void) snprintf(stringo, sizeof(stringo),"=%s echoes :%s\n",users[i].name,parr[1]);
 		rsayb(i,users[i].room,stringo,3,i,-1,-1);
-		(void) sprintf(stringo,"You sorta echo \'%s\'\n",parr[1]);
+		(void) snprintf(stringo, sizeof(stringo),"You sorta echo \'%s\'\n",parr[1]);
 		rshow(i,stringo);
 		return 0;
 	    }
     }
-    (void) sprintf(stringo,"=%s\n",parr[1]);
+    (void) snprintf(stringo, sizeof(stringo),"=%s\n",parr[1]);
     rsayb(i,users[i].room,stringo,3,i,-1,-1);
-    (void) sprintf(stringo,"You echo \'%s\'\n",parr[1]);
+    (void) snprintf(stringo, sizeof(stringo),"You echo \'%s\'\n",parr[1]);
     rshow(i,stringo);
     return 0;
 }
@@ -359,9 +361,9 @@ int i;
 	rshow(i,"You have a sore throat from shouting....\n");
 	return 0;
     }
-    (void) sprintf(stringo,"You shout \"%s\"\n",parr[1]);
+    (void) snprintf(stringo, sizeof(stringo),"You shout \"%s\"\n",parr[1]);
     rshow(i,stringo);
-    (void) sprintf(stringo,"*%s shouts \"%s\"\n",users[i].name,parr[1]);
+    (void) snprintf(stringo, sizeof(stringo),"*%s shouts \"%s\"\n",users[i].name,parr[1]);
     for(j=Firstuser;j!=-1;j=users[j].nextuser) {
 	if ((i!=j)&&(users[j].doing<1000))
 	    if (((users[j].room==users[i].room)&&(users[j].flags&0x010))||
@@ -386,14 +388,14 @@ int i;
     if ((users[i].flags&0x800)!=0) {
         rshow(i,"You cant communicate through the gag!\n");
         return 0;}
-    (void) sprintf(stringo,"You echoall: %s\n",parr[1]);
+    (void) snprintf(stringo, sizeof(stringo),"You echoall: %s\n",parr[1]);
     rshow(i,stringo);
-    (void) sprintf(stringo,"%s\n",parr[1]);
+    (void) snprintf(stringo, sizeof(stringo),"%s\n",parr[1]);
     for(j=Firstuser;j!=-1;j=users[j].nextuser) {
 	if ((i!=j)&&(users[j].doing<1000)) rshow(j,stringo);
     }
     timestr(ti,stringp);
-    (void) sprintf(stringo,"%s: %s echoalled: %s\n",stringp,users[i].name,parr[1]);
+    (void) snprintf(stringo, sizeof(stringo),"%s: %s echoalled: %s\n",stringp,users[i].name,parr[1]);
     Logfile(stringo);
     return 0;
 }
@@ -438,16 +440,16 @@ int i;
 	if (strcmp(unames[users[i].number],parv[2])!=0) {
 	    for (j=0;j<MAXUSERS;j++)
 		if (strcmp(unames[j],parv[2])==0) {
-		    (void) sprintf(stringo,"=%s echoes :%s\n",users[i].name,parr[2]);
+		    (void) snprintf(stringo, sizeof(stringo),"=%s echoes :%s\n",users[i].name,parr[2]);
 		    rsayb(i,users[k].room,stringo,3,i,-1,-1);
-		    (void) sprintf(stringo,"You sorta echo \'%s\'\n",parr[2]);
+		    (void) snprintf(stringo, sizeof(stringo),"You sorta echo \'%s\'\n",parr[2]);
 		    rshow(i,stringo);
 		    return 0;
 		}
 	}
-	(void) sprintf(stringo,"=%s\n",parr[2]);
+	(void) snprintf(stringo, sizeof(stringo),"=%s\n",parr[2]);
 	rsayb(i,users[k].room,stringo,3,i,-1,-1);
-	(void) sprintf(stringo,"You echo \'%s\'\n",parr[2]);
+	(void) snprintf(stringo, sizeof(stringo),"You echo \'%s\'\n",parr[2]);
 	rshow(i,stringo);
 	return 0;
     }
@@ -481,11 +483,11 @@ int i;
 	    }
 	}
     if (!shielded(i,k)) {
-	(void) sprintf(stringo,"You whisper '%s' to %s\n",parr[2],users[k].name);
-	(void) sprintf(stringq,">%s whispers '%s'\n",users[i].name,parr[2]);
+	(void) snprintf(stringo, sizeof(stringo),"You whisper '%s' to %s\n",parr[2],users[k].name);
+	(void) snprintf(stringq, sizeof(stringq),">%s whispers '%s'\n",users[i].name,parr[2]);
 	rshow(i,stringo);
 	rtell(k,stringq);
-	(void)sprintf(stringo,"=%s whispers something to %s.\n",users[i].name,users[k].name);
+	(void)snprintf(stringo, sizeof(stringo),"=%s whispers something to %s.\n",users[i].name,users[k].name);
 	rsayb(i,users[k].room,stringo,1,i,k,-1);
 	return 0;
     }

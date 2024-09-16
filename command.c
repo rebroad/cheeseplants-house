@@ -1,4 +1,6 @@
 #include "header.h"
+#include "globals.h"
+#include "functions.h"
 FILE     *fopen();
 
 /****************************************************************************
@@ -76,7 +78,7 @@ int i;
 	users[i].number=findfile(parv[0]);
 	if (users[i].number>=0) {
 	    users[i].name=cnames[users[i].number];
-	    (void) sprintf(stringo,"Welcome %s.\n",users[i].name);
+	    (void) snprintf(stringo, sizeof(stringo),"Welcome %s.\n",users[i].name);
 	    rshow(i,stringo);
 	    loaduser(i,0);
 	} else  {
@@ -118,9 +120,9 @@ int i;
 	    if (strcmp(parv[0],parr[0])==0) {
 		users[i].desc[0]|=32;
 		users[i].desc[0]^=32;
-		sprintf(stringo,"Welcome %s\nIf you want your name all in lowercase, use the 'recap' command once inside.\n",users[i].desc);
+		snprintf(stringo, sizeof(stringo),"Welcome %s\nIf you want your name all in lowercase, use the 'recap' command once inside.\n",users[i].desc);
 	    } else {
-		sprintf(stringo,"Welcome %s\n",parr[0]);
+		snprintf(stringo, sizeof(stringo),"Welcome %s\n",parr[0]);
 	    }
 	    rshow(i,stringo);
 	    rshow(i,"You've not got a resident character, Do you want to log in anyway?\n");
@@ -296,8 +298,8 @@ int i;
     users[i].flags==0;
     rshow(i,"Okey dokey, You're in... 8-)\n");
     (void) strcpy(users[i].title,"the newly created.");
-    (void) sprintf(users[i].scapename,"%s's mindscape.",users[i].name);
-    (void) sprintf(users[i].scapedesc,"You are in the mindscape of %s.",users[i].name);
+    (void) snprintf(users[i].scapename, sizeof(users[i].scapename),"%s's mindscape.",users[i].name);
+    (void) snprintf(users[i].scapedesc, sizeof(users[i].scapedesc),"You are in the mindscape of %s.",users[i].name);
     (void) strcpy(users[i].prompt,"-=> ");
     shouts[users[i].number]=SHOUTMAX;
     (void) time((time_t *)&lastshout[users[i].number]);

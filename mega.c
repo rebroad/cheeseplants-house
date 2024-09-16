@@ -1,4 +1,6 @@
 #include "header.h"
+#include "globals.h"
+#include "functions.h"
 
 /****************************************************************************
  ****************************************************************************/
@@ -9,9 +11,9 @@ int i;
     int j,k;
     for (j=0;j<MAXEDITS;j++) {
 	if ((k=edits[j].user)==-1) {
-	    (void) sprintf(stringo," %2d : *** This edit slot currently unused! ***\n",j);
+	    (void) snprintf(stringo, sizeof(stringo)," %2d : *** This edit slot currently unused! ***\n",j);
 	} else {
-	    (void) sprintf(stringo," %2d : %s %.55s\n",j,users[k].name,users[k].title);
+	    (void) snprintf(stringo, sizeof(stringo)," %2d : %s %.55s\n",j,users[k].name,users[k].title);
 	}
 	rshow(i,stringo);
     }
@@ -30,7 +32,7 @@ int i;
 	if (unames[n][0]!=0) {
 	    if (!(m&3)) stringp[0]=0;
 	    m=(m+1)&3;
-	    sprintf(stringo,"%-15s%4d%c",cnames[n],n,(m==0)?'\n':' ');
+	    snprintf(stringo, sizeof(stringo),"%-15s%4d%c",cnames[n],n,(m==0)?'\n':' ');
 	    strcat(stringp,stringo);
 	    if ((m&3)==0) rshow(i,stringp);
 	}
@@ -57,15 +59,15 @@ int i;
 	count++;
 	if ((count>start)&&(done<users[i].ttyheight)) {
 	    done++;
-	    (void) sprintf(stringo," %-16s: %s\n",users[j].name,users[j].email);
+	    (void) snprintf(stringo, sizeof(stringo)," %-16s: %s\n",users[j].name,users[j].email);
 	    rshow(i,stringo);
 	}
     }
     if (done==0) return -2;
-    (void) sprintf(stringo,"Users %d-%d from a total of %d.\n",start+1,start+done,count);
+    (void) snprintf(stringo, sizeof(stringo),"Users %d-%d from a total of %d.\n",start+1,start+done,count);
     rshow(i,stringo);
     if (count>(start+done)) {
-	(void) sprintf(stringo,"There will be more users on 'emails %d'\n",start/(users[i].ttyheight-3)+2);
+	(void) snprintf(stringo, sizeof(stringo),"There will be more users on 'emails %d'\n",start/(users[i].ttyheight-3)+2);
 	rshow(i,stringo);}
     return 0; 
 };
@@ -85,15 +87,15 @@ int i;
 	count++;
 	if ((count>start)&&(done<users[i].ttyheight)) {
 	    done++;
-	    (void) sprintf(stringo," %-16s: %s\n",users[j].name,users[j].comment);
+	    (void) snprintf(stringo, sizeof(stringo)," %-16s: %s\n",users[j].name,users[j].comment);
 	    rshow(i,stringo);
 	}
     }
     if (done==0) return -2;
-    (void) sprintf(stringo,"Users %d-%d from a total of %d.\n",start+1,start+done,count);
+    (void) snprintf(stringo, sizeof(stringo),"Users %d-%d from a total of %d.\n",start+1,start+done,count);
     rshow(i,stringo);
     if (count>(start+done)) {
-	(void) sprintf(stringo,"There will be more users on 'comments %d'\n",start/(users[i].ttyheight-3)+2);
+	(void) snprintf(stringo, sizeof(stringo),"There will be more users on 'comments %d'\n",start/(users[i].ttyheight-3)+2);
 	rshow(i,stringo);}
     return 0; 
 };
@@ -113,15 +115,15 @@ int i;
 	count++;
 	if ((count>start)&&(done<users[i].ttyheight)) {
 	    done++;
-	    (void) sprintf(stringo," %-16s: %s\n",users[j].name,users[j].tty);
+	    (void) snprintf(stringo, sizeof(stringo)," %-16s: %s\n",users[j].name,users[j].tty);
 	    rshow(i,stringo);
 	}
     }
     if (done==0) return -2;
-    (void) sprintf(stringo,"Users %d-%d from a total of %d.\n",start+1,start+done,count);
+    (void) snprintf(stringo, sizeof(stringo),"Users %d-%d from a total of %d.\n",start+1,start+done,count);
     rshow(i,stringo);
     if (count>(start+done)) {
-	(void) sprintf(stringo,"There will be more users on 'ttys %d'\n",start/(users[i].ttyheight-3)+2);
+	(void) snprintf(stringo, sizeof(stringo),"There will be more users on 'ttys %d'\n",start/(users[i].ttyheight-3)+2);
 	rshow(i,stringo);}
     return 0; 
 };
@@ -137,13 +139,13 @@ int i;
     if ((j=locateusernum(k))<0) {
 	loadtempuser(k);
 	(void) strncpy(users[255].email,parr[2],79);
-	(void) sprintf(stringo,"You set the email address:\n %-16s: %s\n",cnames[k],users[255].email);
+	(void) snprintf(stringo, sizeof(stringo),"You set the email address:\n %-16s: %s\n",cnames[k],users[255].email);
 	rshow(i,stringo);
 	savetempuser();
 	return 0;
     }
     (void) strncpy(users[j].email,parr[2],79);
-    (void) sprintf(stringo,"You set the email address:\n %-16s: %s\n",cnames[k],users[j].email);
+    (void) snprintf(stringo, sizeof(stringo),"You set the email address:\n %-16s: %s\n",cnames[k],users[j].email);
     rshow(i,stringo);
     return 0;
 }
@@ -159,14 +161,14 @@ int i;
     if ((j=locateusernum(k))<0) {
 	loadtempuser(k);
 	(void) strncpy(users[255].comment,parr[2],79);
-	(void) sprintf(stringo,"You set the comment:\n %-16s: %s\n",cnames[k],users[255].comment);
+	(void) snprintf(stringo, sizeof(stringo),"You set the comment:\n %-16s: %s\n",cnames[k],users[255].comment);
 	rshow(i,stringo);
 	savetempuser();
 	return 0;
     }
     if ((j=scanuser(parv[1]))<0) return j;
     (void) strncpy(users[j].comment,parr[2],79);
-    (void) sprintf(stringo,"You set the comment:\n %-16s: %s\n",cnames[k],users[j].comment);
+    (void) snprintf(stringo, sizeof(stringo),"You set the comment:\n %-16s: %s\n",cnames[k],users[j].comment);
     rshow(i,stringo);
     return 0;
 }
@@ -340,8 +342,8 @@ int i;
 	rshow(i,"You're already there!!!\n");
 	return 0;
     }
-    (void) sprintf(stringp,"%s just isnt here anymore.\n",users[i].name);
-    (void) sprintf(stringq,"%s is now here.\n",users[i].name);
+    (void) snprintf(stringp, sizeof(stringp),"%s just isnt here anymore.\n",users[i].name);
+    (void) snprintf(stringq, sizeof(stringq),"%s is now here.\n",users[i].name);
     moveuser(i,users[j].room,stringp,stringq);
     return 0;
 }
@@ -358,8 +360,8 @@ int i;
 	rshow(i,"You're already IN there!\n");
 	return 0;
     }
-    (void) sprintf(stringp,"%s seems not to be here.\n",users[i].name);
-    (void) sprintf(stringq,"%s enters from nowhere in particular.\n",users[i].name);
+    (void) snprintf(stringp, sizeof(stringp),"%s seems not to be here.\n",users[i].name);
+    (void) snprintf(stringq, sizeof(stringq),"%s enters from nowhere in particular.\n",users[i].name);
     moveuser(i,j,stringp,stringq);
     return 0;
 }
@@ -376,7 +378,7 @@ int i;
 	rshow(i,"You're already IN there!\n");
 	return 0;
     }
-    (void) sprintf(stringp,"%s aint here any more.\n",users[i].name);
+    (void) snprintf(stringp, sizeof(stringp),"%s aint here any more.\n",users[i].name);
     moveuser(i,j,stringp,"");
     return 0;
 }
@@ -395,8 +397,8 @@ int i;
         rshow(i,"They're already IN there!\n");
         return 0;
     }
-    (void) sprintf(stringp,"%s is dragged off somewhere.\n",users[k].name);
-    (void) sprintf(stringq,"%s arrives from elsewhere.\n",users[k].name);
+    (void) snprintf(stringp, sizeof(stringp),"%s is dragged off somewhere.\n",users[k].name);
+    (void) snprintf(stringq, sizeof(stringq),"%s arrives from elsewhere.\n",users[k].name);
     moveuser(k,j,stringp,stringq);
     rshow(i,"Moved them.\n");
     return 0;
@@ -412,7 +414,7 @@ int i;
     if ((j=scanuser(parv[1]))<0) return j;
     rshow(j,"\007\007\007\007\007\007\007\007");
     if (parv[2][0]!=0) {
-	(void) sprintf(stringo,"%s pages you: %s\n",users[i].name,parr[2]);
+	(void) snprintf(stringo, sizeof(stringo),"%s pages you: %s\n",users[i].name,parr[2]);
 	rshow(j,stringo);
     }
     rshow(i,"Beeped!\n");
@@ -462,7 +464,7 @@ int i;
 	if ((count>start)&&(done<users[i].ttyheight)) {
 	    done++;
 	    f=users[j].flags;
-	    (void) sprintf(stringo," %-16sRes Tit Des Pro CPr TPr Lst SNa SDe ETo EAt EAl Evc Trc Tag\n",users[j].name);
+	    (void) snprintf(stringo, sizeof(stringo)," %-16sRes Tit Des Pro CPr TPr Lst SNa SDe ETo EAt EAl Evc Trc Tag\n",users[j].name);
 	    doflag(f,1,"Res","---",17);
 	    doflag(f,2,"Tit","---",21);
 	    doflag(f,8,"Pro","---",25);
@@ -482,10 +484,10 @@ int i;
 	}
     }
     if (done==0) return -2;
-    (void) sprintf(stringo,"Users %d-%d from a total of %d.\n",start+1,start+done,count);
+    (void) snprintf(stringo, sizeof(stringo),"Users %d-%d from a total of %d.\n",start+1,start+done,count);
     rshow(i,stringo);
     if (count>(start+done)) {
-	(void) sprintf(stringo,"There will be more users on 'stats %d'\n",start/(users[i].ttyheight-3)+2);
+	(void) snprintf(stringo, sizeof(stringo),"There will be more users on 'stats %d'\n",start/(users[i].ttyheight-3)+2);
 	rshow(i,stringo);}
     return 0; 
 };
@@ -500,17 +502,17 @@ int i;
     double lpm,spl;
     if (parv[1][0]==0) {
 	rshow(i,"Showing data on LASS Externals....\n");
-	(void) sprintf(stringo,"Current number of LASS externals on:%d\nLASS User limit set up as:%d\n",Lassusers,Maxlassusers);
+	(void) snprintf(stringo, sizeof(stringo),"Current number of LASS externals on:%d\nLASS User limit set up as:%d\n",Lassusers,Maxlassusers);
 	rshow(i,stringo);
 	(void) time((time_t*)&ti);
 	if ((ti-lasschecktime)==0) lasschecktime--;
 	lpm=((double)(60*lasstries))/((double)(ti-lasschecktime));
 	spl=((double)(ti-lasschecktime))/(double)lasstries;
-	sprintf(stringo,"Average Lass attempts per minute: %f\n",lpm);
+	snprintf(stringo, sizeof(stringo),"Average Lass attempts per minute: %f\n",lpm);
 	rshow(i,stringo);
-	sprintf(stringo,"Average Time between attempts   : %f secs.\n",spl);
+	snprintf(stringo, sizeof(stringo),"Average Time between attempts   : %f secs.\n",spl);
 	rshow(i,stringo);
-	sprintf(stringo,"Time between retries should be %d secs\nTime waited: %d Calls Tried %d\n",lasswait,ti-lasschecktime,lasstries);
+	snprintf(stringo, sizeof(stringo),"Time between retries should be %d secs\nTime waited: %d Calls Tried %d\n",lasswait,ti-lasschecktime,lasstries);
 	rshow(i,stringo);
 	if (lasstries>100) {lasschecktime=ti;lasstries=0;};
 	return 0;
@@ -518,7 +520,7 @@ int i;
     j=atoi(parv[1]);
     if (j<=0) j=1;
     Maxlassusers=j;
-    (void) sprintf(stringo,"Maximum LASS users set to %d.\n",Maxlassusers);
+    (void) snprintf(stringo, sizeof(stringo),"Maximum LASS users set to %d.\n",Maxlassusers);
     rshow(i,stringo);
     return 0;
 }
@@ -532,16 +534,16 @@ int i;
     int j,k;
     if ((j=scanuser(parv[1]))<0) return j;
     if (parv[2][0]==0) {
-	(void) sprintf(stringo,"Shout data for user %s.\n",users[j].name);
+	(void) snprintf(stringo, sizeof(stringo),"Shout data for user %s.\n",users[j].name);
 	rshow(i,stringo);
 	if ((ti-lastshout[users[j].number])>SHOUTTIME) {
 	    rshow(i,"They are free to shout again.....\n");
 	} else {
 	    ltimestr(SHOUTTIME-(ti-lastshout[users[j].number]),stringp);
-	    (void) sprintf(stringo,"Next shout in %s.\n",stringp);
+	    (void) snprintf(stringo, sizeof(stringo),"Next shout in %s.\n",stringp);
 	    rshow(i,stringo);
 	}
-	(void) sprintf(stringo,"Shouts made recently: %d\n",shouts[users[j].number]);
+	(void) snprintf(stringo, sizeof(stringo),"Shouts made recently: %d\n",shouts[users[j].number]);
 	rshow(i,stringo);
 	if (shouts[users[j].number]>=SHOUTMAX) 
 	    rshow(i,"Time listed about is in effect... *** SORE THROAT ***\n");
@@ -608,7 +610,7 @@ int i;
 	stringo[l]=0;
 	c=(char) atoi(stringo);
 	(void) write(j,&c,1);
-	(void) sprintf(stringo,"Sent character %d.\n",(int) c);
+	(void) snprintf(stringo, sizeof(stringo),"Sent character %d.\n",(int) c);
 	rshow(i,stringo);
 	if (parr[2][k]==0) return 0;
     }
@@ -670,7 +672,7 @@ int i;
     } else {
 	if ((j=findfile(parv[1]))<0) return j;
     }
-    sprintf(stringo,"Removing user '%s' #%d.....\n",cnames[j],j);
+    snprintf(stringo, sizeof(stringo),"Removing user '%s' #%d.....\n",cnames[j],j);
     rshow(i,stringo);
     vapemail(j);
     filezaplist(j);
@@ -752,10 +754,10 @@ int i;
 	rshow(i,stringo);
     }
     if (done==0) return -2;
-    (void) sprintf(stringo,"Hosts %d-%d from a total of %d.\n",start+1,start+done,count);
+    (void) snprintf(stringo, sizeof(stringo),"Hosts %d-%d from a total of %d.\n",start+1,start+done,count);
     rshow(i,stringo);
     if (count>(start+done)) {
-	(void) sprintf(stringo,"There will be more on 'hostinfo %d'\n",start/(users[i].ttyheight-3)+2);
+	(void) snprintf(stringo, sizeof(stringo),"There will be more on 'hostinfo %d'\n",start/(users[i].ttyheight-3)+2);
 	rshow(i,stringo);}
     return 0; 
 };
@@ -796,7 +798,7 @@ int i;
     }
     for (j=0;(hostlist[j].s_addr!=0)&&(j<MAXHOSTS);j++)
 	if (hostlist[j].s_addr==a->s_addr) {
-	    sprintf(stringo,"Already on list as number %d.\n",j);
+	    snprintf(stringo, sizeof(stringo),"Already on list as number %d.\n",j);
 	    rshow(i,stringo);
 	    return 0;};
     if (j==MAXHOSTS) {
@@ -806,7 +808,7 @@ int i;
     hostlist[j].s_addr=a->s_addr;
     hoststatus[j]=0;
     strncpy(hostlabel[j],parr[1],19);
-    sprintf(stringo,"Host added to list as entry %d.\n",j);
+    snprintf(stringo, sizeof(stringo),"Host added to list as entry %d.\n",j);
     rshow(i,stringo);
     return 0;
 }
@@ -839,7 +841,7 @@ int i;
 	    rshow(i,"Could not be located.\n");
 	    return 0;
 	}
-	sprintf(stringo,"Host is %s.\n",h->h_name);
+	snprintf(stringo, sizeof(stringo),"Host is %s.\n",h->h_name);
 	strncpy(hostlabel[j],h->h_name,19);
 	rshow(i,stringo);
 	return 0;
@@ -916,7 +918,7 @@ int i;
     /* Now evict them */
     (void) time((time_t*)&ti);
     timestr(ti,stringp);
-    (void) sprintf(stringo,"%s: %s objected to by:",stringp,users[n].name);
+    (void) snprintf(stringo, sizeof(stringo),"%s: %s objected to by:",stringp,users[n].name);
     for (j=0;j<OBJECTNUM;j++) {
 	strcat(stringo,cnames[users[n].objected[j]]);
 	if (j!=(OBJECTNUM-1)) {
@@ -930,7 +932,7 @@ int i;
 	int k;
 	k=findusernum(users[n].objected[j]);
 	if (k<0) {
-	    sprintf(stringo,"   %-15s     *** FAULT ***\n",cnames[users[n].objected[j]]);
+	    snprintf(stringo, sizeof(stringo),"   %-15s     *** FAULT ***\n",cnames[users[n].objected[j]]);
 	} else {
 	    sprintf(stringo,"   %-15s:%s\n",cnames[users[n].objected[j]],
 		    users[k].objection);

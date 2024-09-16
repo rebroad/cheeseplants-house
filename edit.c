@@ -1,4 +1,5 @@
 #include "header.h"
+#include "globals.h"
 
 /****************************************************************************
  ****************************************************************************/
@@ -76,7 +77,7 @@ int i;
     rshow(i,edits[users[i].ednum].buffer);
     rshow(i,"\n  ===========================================================================\n");
     if (((users[i].doing%1000)!=202)&&((users[i].doing%1000)!=203)) {
-	(void) sprintf(stringo,"Name: %s\n",edits[users[i].ednum].name);
+	(void) snprintf(stringo, sizeof(stringo),"Name: %s\n",edits[users[i].ednum].name);
 	rshow(i,stringo);
     }
     return 0;
@@ -146,7 +147,7 @@ int i;
     ll=strlen(edits[users[i].ednum].buffer);
     parr[0][78]=0;
     if ((ll+l+1)>1023) {
-	(void) sprintf(stringo,"That line is %d characters too long...\n",(ll+l+1)-1023);
+	(void) snprintf(stringo, sizeof(stringo),"That line is %d characters too long...\n",(ll+l+1)-1023);
 	rshow(i,stringo);
 	return 0;
     }
@@ -223,7 +224,7 @@ edit_name(i)
 int i;
 {
     (void) strncpy(edits[users[i].ednum].name,parr[1],63);
-    (void) sprintf(stringo,"Name now: %.63s\n",parr[1]);
+    (void) snprintf(stringo, sizeof(stringo),"Name now: %.63s\n",parr[1]);
     rshow(i,stringo);
     return 0;
 }

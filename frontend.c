@@ -1,4 +1,5 @@
 #include "header.h"
+#include "globals.h"
 
 /****************************************************************************
  ****************************************************************************/
@@ -68,7 +69,7 @@ gotohouse(i,r)
 int i,r;
 {
     users[i].doing=100;
-    sprintf(stringo,"%s enters from outside the house.\n",users[i].name);
+    snprintf(stringo, sizeof(stringo),"%s enters from outside the house.\n",users[i].name);
     moveuser(i,r,"",stringo);
     announce(i);
     return 0;
