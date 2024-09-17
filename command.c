@@ -1,11 +1,23 @@
+/**
+ * @file command.c
+ * @brief Handles user commands in the chat system.
+ *
+ * This file contains functions for processing and executing user commands.
+ * It includes command parsing, user authentication, and implementation of
+ * various chat commands like messaging, user management, and system controls.
+ */
+
 #include "header.h"
 #include "globals.h"
 #include "functions.h"
-FILE     *fopen();
 
-/****************************************************************************
- ****************************************************************************/
-
+/**
+ * @brief Process the username entered by a user.
+ * @param i User index.
+ *
+ * This function handles the initial login process, checking if the username
+ * is valid, banned, or already in use. It also handles tiny connections.
+ */
 getusername(i)
 int i;
 {
@@ -357,9 +369,15 @@ int i,e;
     return;
 }
 
-/****************************************************************************
- ****************************************************************************/
-
+/**
+ * @brief Parse and execute a user command.
+ * @param i User index.
+ * @return Status code of the command execution.
+ *
+ * This function takes a user's input, parses it into a command and arguments,
+ * and executes the corresponding function. It handles all available commands
+ * in the chat system.
+ */
 parsecommand(i)
 int i;
 {
@@ -521,12 +539,14 @@ int i;
     return -1;
 }
 
-/****************************************************************************
-  FUNCTION - sillycrypt(string)
-  Returns the 'crypt value' for the input string as used for the horribly
-  kludgy old password system.
- ****************************************************************************/
-
+/**
+ * @brief Encrypt a string using a simple substitution cipher.
+ * @param a The string to encrypt.
+ * @return The encrypted integer value.
+ *
+ * This function is used for the old password system. It's a basic
+ * encryption method and should not be considered secure for modern use.
+ */
 sillycrypt(a)
 char* a;
 {
@@ -544,12 +564,14 @@ char* a;
     return j;
 }
 
-/****************************************************************************
-  FUNCTION - banished(string)
-  Returns whether the string passed constitutes a banished name or not.
-  Ie, if it IS banished, return True (non-zero) otherwise false.
- ****************************************************************************/
-
+/**
+ * @brief Check if a username is banned.
+ * @param a The username to check.
+ * @return Non-zero if banned, 0 otherwise.
+ *
+ * This function checks against a list of banned words and a file of banned names.
+ * It's used during user registration to prevent inappropriate usernames.
+ */
 banished(a)
 char *a;
 {
