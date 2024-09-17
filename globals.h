@@ -3,6 +3,8 @@
 
 #include "header.h"
 
+#define MAX_STRING_LENGTH 2060
+
 extern int     Portnum;
 extern int     Lasthour;
 extern int     Ipmonitor;
@@ -19,12 +21,10 @@ extern int     houseflags;
 extern int     lasttick;
 
 extern char    capstr[64];
-extern char    stringo[2048];
-extern char    stringp[2048];
-extern char    stringq[2048];
-extern char    stringr[2048];
-extern char    stringt[2048];
-extern char    stringu[2048];
+extern char    stringo[MAX_STRING_LENGTH];
+extern char    stringp[MAX_STRING_LENGTH];
+extern char    stringq[MAX_STRING_LENGTH];
+extern char    stringr[MAX_STRING_LENGTH];
 
 extern char    *argles;
 

@@ -298,36 +298,63 @@ int i;
     return 0;
 }
 
-
-/****************************************************************************
- ****************************************************************************/
-
-log(i)
-int i;
-{
+log(int i) {
     int j,k,li,lo;
-    if (parv[1][0]==0) return -5;
-    if ((j=findfile(parv[1]))<0) return j;
+
+    debug_log("Entering log function for user %d", i);
+
+    if (parv[1][0]==0) {
+        debug_log("No argument provided for log command");
+        return -5;
+    }
+
+    if ((j=findfile(parv[1]))<0) {
+        debug_log("findfile returned %d for argument %s", j, parv[1]);
+        return j;
+    }
+
+    debug_log("Found file for user %d", j);
+
+    if (j < 0 || j >= MAXUSERS) {
+        debug_log("Invalid user index %d", j);
+        return -1;
+    }
+
     if ((k=locateusernum(j))<0) {
+        debug_log("User %d is not currently logged in", j);
 	li=filelog(j,&li,&lo);
 	if (li<1) {
-	    (void) snprintf(stringo, sizeof(stringo),"%s hasnt logged in before.\n",cnames[j]);
+            if (cnames[j] != NULL) {
+	        snprintf(stringo, sizeof(stringo), "%s hasnt logged in before.\n", cnames[j]);
+            } else {
+                snprintf(stringo, sizeof(stringo), "User %d hasnt logged in before.\n", j);
+            }
 	} else {
 	    timestr(li,stringp);
 	    timestr(lo,stringq);
 	    ltimestr(lo-li,stringr);
-	    (void) snprintf(stringo, sizeof(stringo),"User: %s\nLast logged in:  %s\nLast logged out: %s\nLogged in for a total of %s\n",cnames[j],stringp,stringq,stringr);
+            if (cnames[j] != NULL) {
+	        snprintf(stringo, sizeof(stringo), "User: %s\nLast logged in:  %s\nLast logged out: %s\nLogged in for a total of %s\n", cnames[j], stringp, stringq, stringr);
+            } else {
+                snprintf(stringo, sizeof(stringo), "User: %d\nLast logged in:  %s\nLast logged out: %s\nLogged in for a total of %s\n", j, stringp, stringq, stringr);
+            }
 	}
 	rshow(i,stringo);
-	return 0;
     } else {
-	snprintf(stringo, sizeof(stringo),"%s is logged in RIGHT NOW!!!!\n",cnames[j]);
+        debug_log("User %d is currently logged in", j);
+        if (cnames[j] != NULL) {
+	    snprintf(stringo, sizeof(stringo),"%s is logged in RIGHT NOW!!!!\n", cnames[j]);
+        } else {
+	    snprintf(stringo, sizeof(stringo),"User %d is logged in RIGHT NOW!!!!\n", j);
+        }
 	rshow(i,stringo);
 	timestr(users[k].lastlogin,stringp);
-	snprintf(stringo, sizeof(stringo),"And has been since %s.\n",stringp);
+	snprintf(stringo, sizeof(stringo), "And has been since %s.\n", stringp);
 	rshow(i,stringo);
-	return 0;
     }
+
+    debug_log("Exiting log function for user %d", i);
+    return 0;
 }
 
 /****************************************************************************
@@ -536,7 +563,7 @@ int i;
     if ((j=scanuser(parv[1]))<0) return j;
     (void) roomname(users[j].room,stringp);
     if (i==j) {
-	(void) snprintf(stringo, sizeof(stringo),"You are in %s\n",stringp);
+	(void) snprintf(stringo, MAX_STRING_LENGTH, "You are in %s\n", stringp);
     } else {
 	if (users[i].room==users[j].room) {
 	    (void) snprintf(stringo, sizeof(stringo),"%s is here in the same room as you!!\n",users[j].name);
