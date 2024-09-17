@@ -276,24 +276,12 @@ DoConnect()
 	    if (d==249) users[path].logintype=1; /*LASS n4*/
 	    if (d==248) users[path].logintype=1; /*LASS n1*/
 	    break;
-/*	case 193 :
-	    if ((d==129)||(d==130)) users[path].logintype=1; LASS n1 (old)*/
-	    break;
 	case 144 :
 	    if (d==193) users[path].logintype=1; /*LASS n5*/
 	    break;
 	}
     }
-/*    if (((a==127)&&(b==0)&&(c==0))||((a==140)&&(b==160))) {*/
     if (1) {
-	if ((a==129)&&(b==31)&&(c==80)&&(d==121)) {
-	    rshow(path,"Access from igate has been barred.\n");
-	    (void) close(path);
-	    users[path].logintype=0;
-	    users[path].doing=0;
-	    users[path].host[0]=0;
-	    return 0;
-	}
 	{
 	    int i;
 	    for (i=0;(i<MAXHOSTS)&&(hostlist[i].s_addr!=0);i++)
