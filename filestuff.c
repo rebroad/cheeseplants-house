@@ -1,19 +1,41 @@
+/**
+ * @file filestuff.c
+ * @brief Handles file operations for the chat system database.
+ *
+ * This file contains functions for reading, writing, and managing user data
+ * in the chat system's file-based database. It includes operations like
+ * initializing files, saving and loading user data, and managing file entries.
+ */
+
 #include <sys/mman.h>
 #include <unistd.h>
 #include "header.h"
 #include "globals.h"
 #include "functions.h"
+
 #define BLOCKSIZE 256
 #define BLOCKNUM 10
 
-int cptr,dptr;
-int bufpoint;
-char filebuffer[(BLOCKSIZE-8)*BLOCKNUM];
+// Global variables for file handling
+int cptr, dptr;  // File descriptors for catalogue and data files
+int bufpoint;    // Current position in file buffer
+char filebuffer[(BLOCKSIZE-8)*BLOCKNUM];  // Bugger for file operations
 
 #ifdef HAS_MMAP
 int *Entry;
 
+/**
+ * @brief Get an entry from the memory-mapped catalogue.
+ * @param n Index of the entry.
+ * @return The value of the entry, converted from network byte order.
+ */
 inline static int GETENTRY(int n) {return ntohl(Entry[n]);}
+
+/**
+ * @brief Set an entry in the memory-mapped catalogue.
+ * @param n Index of the entry.
+ * @param v Value to set, will be converted to network byte order.
+ */
 inline static void SETENTRY(int n, int v) {Entry[n]=htonl(v);}
 #else
 int *memEntry;
@@ -28,9 +50,13 @@ inline static void SETENTRY(int n, int v) {
 }
 #endif
 
-/****************************************************************************
- ****************************************************************************/
-
+/**
+ * @brief Initialize the file system for the chat database.
+ *
+ * This function sets up the catalogue and data files, creating them if they
+ * don't exist or opening them if they do. It also initializes the Entry array
+ * either through mmap or direct file reading.
+ */
 initfiles()
 {
     if (mkdir("Data", 0755) == -1 && errno != EEXIST) {
@@ -120,20 +146,24 @@ int fptr;
     return i;
 }
 
-/****************************************************************************
- ****************************************************************************/
-
+/**
+ * @brief Create a new block in the data file.
+ * @return Index of the newly created block.
+ *
+ * This function creates a new empty block at the end of the data file.
+ * It updates the entry table and returns the index of the new block.
+ */
 CreateBlock()
 {
     char empty[BLOCKSIZE-8];
     int index;
-    bzero(empty,BLOCKSIZE-8);
-    index=GETENTRY(0);
-    index=lseek(dptr,0L,SEEK_END)/BLOCKSIZE;
-    putint(dptr,-1);
-    putint(dptr,-1);
-    (void) write(dptr,empty,BLOCKSIZE-8);
-    SETENTRY(0, GETENTRY(0)+1);
+    bzero(empty,BLOCKSIZE-8);  // Initialize empty block
+    index=GETENTRY(0);         // Get current block count
+    index=lseek(dptr,0L,SEEK_END)/BLOCKSIZE;  // Calculate new block index
+    putint(dptr,-1);           // Write -1 as next block pointer
+    putint(dptr,-1);           // Write -1 as user number (empty block)
+    (void) write(dptr,empty,BLOCKSIZE-8);  // Write empty data
+    SETENTRY(0, GETENTRY(0)+1);  // Increment block count
     return index;
 }
 
@@ -238,9 +268,15 @@ int n;
     return count;
 }
 
-/****************************************************************************
- ****************************************************************************/
-
+/**
+ * @brief Write user data to file.
+ * @param n User number.
+ * @param typ Type of save operation (1 for logout, 2 for periodic save).
+ *
+ * This function saves user data to the file system. It handles various user
+ * flags and attributes, ensuring that only allowed data is saved based on
+ * the user's permissions.
+ */
 saveuser(n,typ)
 int n,typ;
 {

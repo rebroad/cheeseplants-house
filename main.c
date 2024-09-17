@@ -1,3 +1,12 @@
+/**
+ * @file main.c
+ * @brief Main entry point and initialization for the chat system.
+ *
+ * This file contains the main() function which initializes the chat system,
+ * sets up signal handling, and starts the main server loop. It also includes
+ * utility functions for logging and debug output.
+ */
+
 #include "header.h"
 #include "globals.h"
 #include "telnet.h"

@@ -188,9 +188,14 @@ char *a;
     return -1;
 }
 
-/****************************************************************************
- ****************************************************************************/
-
+/**
+ * @brief Grant or revoke a specific flag for a user.
+ * @param i The user granting the flag.
+ * @return 0 on success, error code otherwise.
+ *
+ * This function allows privileged users to grant or revoke specific
+ * flags (permissions) for other users. It's part of the user management system.
+ */
 allow(i)
 int i;
 {
@@ -254,9 +259,14 @@ char *a;
     return -1;
 }
     
-/****************************************************************************
- ****************************************************************************/
-
+/**
+ * @brief Grant a power flag to a user.
+ * @param i The user granting the power.
+ * @return 0 on success, error code otherwise.
+ *
+ * This function is used to grant special powers or privileges to users.
+ * It's typically used by administrators to manage user roles.
+ */
 bestow(i)
 int i;
 {

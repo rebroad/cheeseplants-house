@@ -2,9 +2,14 @@
 #include "globals.h"
 #include "functions.h"
 
-/****************************************************************************
- ****************************************************************************/
-
+/**
+ * @brief Display the user list.
+ * @param i The user requesting the list.
+ * @return 0 on success, error code otherwise.
+ *
+ * This function displays a list of currently logged-in users, including
+ * their login type and title. It handles pagination for large user lists.
+ */
 who(i)
 int i;
 {
@@ -551,9 +556,14 @@ int i;
     return 0;
 }
 
-/****************************************************************************
- ****************************************************************************/
-
+/**
+ * @brief Handle the 'examine' command to view user details.
+ * @param i The user executing the command.
+ * @return 0 on success, error code otherwise.
+ *
+ * This function allows a user to view details of another user in the same room.
+ * It displays the user's name, title, and description.
+ */
 examine(i)
 int i;
 {
