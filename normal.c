@@ -343,7 +343,7 @@ log(int i) {
     } else {
         debug_log("User %d is currently logged in", j);
         if (cnames[j] != NULL) {
-	    snprintf(stringo, sizeof(stringo),"%s is logged in RIGHT NOW!!!!\n", cnames[j]);
+	    snprintf(stringo, MAX_STRING_LENGTH, "%s is logged in RIGHT NOW!!!!\n", cnames[j]);
         } else {
 	    snprintf(stringo, sizeof(stringo),"User %d is logged in RIGHT NOW!!!!\n", j);
         }

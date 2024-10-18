@@ -79,10 +79,10 @@ int i;
 	    KillConnect(i);
 	    return;};
 	if ((j=finduser(parv[0]))>=0) {
-	    (void) strcpy(users[i].desc,parv[0]);
+	    strcpy(users[i].desc, parv[0]);
 	    users[i].olddoing=j;
 	    users[i].oldpasswd=users[j].oldpasswd;
-	    strcpy(users[i].passwd,users[j].passwd);
+	    strcpy(users[i].passwd, users[j].passwd);
 	    users[i].doing=8;
 	    return;
 	}
@@ -128,7 +128,7 @@ int i;
 		KillConnect(i);
 		return;
 	    }
-	    (void) strcpy(users[i].desc,parr[0]);
+	    strcpy(users[i].desc, parr[0]);
 	    if (strcmp(parv[0],parr[0])==0) {
 		users[i].desc[0]|=32;
 		users[i].desc[0]^=32;
@@ -222,7 +222,7 @@ int i;
 
 {
     char opass[16];
-    (void) strcpy(opass,crypt(parr[0],"CP"));
+    strcpy(opass,crypt(parr[0],"CP"));
     if (strcmp(opass,users[i].passwd)!=0) {
 	rshow(i,"INCORRECT PASSWORD! Abandoning change attempt.\n");
 	users[i].doing=users[i].olddoing;
@@ -243,7 +243,7 @@ int i;
 	users[i].doing=users[i].olddoing;
 	return;
     }
-    (void) strcpy(users[i].npasswd,crypt(parr[0],"CP"));
+    strcpy(users[i].npasswd, crypt(parr[0], "CP"));
     users[i].doing=6;
     return;
 }
@@ -260,13 +260,13 @@ int i;
 	users[i].doing=users[i].olddoing;
 	return;
     }
-    (void) strcpy(opass,crypt(parr[0],"CP"));
+    trcpy(opass,crypt(parr[0], "CP"));
     if (strcmp(opass,users[i].npasswd)!=0) {
 	rshow(i,"PASSWORDS DO NOT MATCH! Abandoning attempt.\n");
 	users[i].doing=users[i].olddoing;
 	return;
     }
-    (void) strcpy(users[i].passwd,opass);
+    strcpy(users[i].passwd,opass);
     rshow(i,"Password set... \n");
     users[i].doing=users[i].olddoing;
     return;
@@ -297,7 +297,7 @@ int i;
 	LostConnect(i);
 	return;};
     rshow(i,"Ok then, creating user...\n");
-    (void) strcpy(cnames[j],users[i].desc);
+    strcpy(cnames[j], users[i].desc);
     {
 	int k;
 	for (k=0;cnames[j][k];k++) unames[j][k]=cnames[j][k]|32;
@@ -309,10 +309,10 @@ int i;
     users[i].desc[0]=0;
     users[i].flags==0;
     rshow(i,"Okey dokey, You're in... 8-)\n");
-    (void) strcpy(users[i].title,"the newly created.");
-    (void) snprintf(users[i].scapename, sizeof(users[i].scapename),"%s's mindscape.",users[i].name);
-    (void) snprintf(users[i].scapedesc, sizeof(users[i].scapedesc),"You are in the mindscape of %s.",users[i].name);
-    (void) strcpy(users[i].prompt,"-=> ");
+    strcpy(users[i].title, "the newly created.");
+    snprintf(users[i].scapename, sizeof(users[i].scapename),"%s's mindscape.",users[i].name);
+    snprintf(users[i].scapedesc, sizeof(users[i].scapedesc),"You are in the mindscape of %s.",users[i].name);
+    strcpy(users[i].prompt,"-=> ");
     shouts[users[i].number]=SHOUTMAX;
     (void) time((time_t *)&lastshout[users[i].number]);
     doentry(i);
